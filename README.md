@@ -3,6 +3,7 @@
 ## process.env
 
 ```
+SERVER_PORT=3001
 DB_USER=avetisk
 DB_DATABASE=blog_dwwm
 ```
