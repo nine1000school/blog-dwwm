@@ -34,5 +34,13 @@ export const validateLimit = yup
   .max(config.view.results.maxLimit)
   .integer()
   .default(config.view.results.defaultLimit)
+  .label("Pagination limit")
 
-export const validateOffset = yup.number().min(0).integer().default(0)
+export const validateOffset = yup
+  .number()
+  .min(0)
+  .integer()
+  .default(0)
+  .label("Pagination offset")
+
+export const validateId = yup.number().integer().min(1).label("User ID")
