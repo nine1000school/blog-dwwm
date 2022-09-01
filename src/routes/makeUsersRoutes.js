@@ -16,13 +16,13 @@ const makeUsersRoutes = ({ app, db }) => {
     validate({
       body: {
         email: validateEmail.required(),
-        password: validatePassword.required(),
         username: validateUsername.required(),
         displayName: validateDisplayName.required(),
+        password: validatePassword.required(),
       },
     }),
     async (req, res) => {
-      const { email, username, password, displayName } = req.body
+      const { email, username, displayName, password } = req.body
 
       try {
         const [user] = await db("users")
@@ -35,14 +35,12 @@ const makeUsersRoutes = ({ app, db }) => {
           })
           .returning("*")
 
-        res.send({ result: user, count: 1 })
+        res.send(user) // filter sensitive data
       } catch (err) {
         if (err.code === "23505") {
           res.status(409).send({
             error: [
-              `Duplicated entry for: "${
-                err.constraint.split("_").slice(-2, -1)[0]
-              }"`,
+              `Duplicated value for "${err.detail.match(/^Key \((\w+)\)/)[1]}"`,
             ],
           })
 
@@ -52,7 +50,7 @@ const makeUsersRoutes = ({ app, db }) => {
         // eslint-disable-next-line no-console
         console.error(err)
 
-        res.status(500).send({ error: ["Something went wrong."] })
+        res.status(500).send({ error: "Oops. Something went wrong." })
       }
     }
   )
@@ -67,10 +65,9 @@ const makeUsersRoutes = ({ app, db }) => {
     }),
     async (req, res) => {
       const { limit, offset } = req.query
-      const [{ count }] = await db("users").count()
-      const result = await db("users").limit(limit).offset(offset)
+      const users = await db("users").limit(limit).offset(offset)
 
-      res.send({ result, count: Number(count) })
+      res.send(users)
     }
   )
   // READ single
@@ -83,7 +80,6 @@ const makeUsersRoutes = ({ app, db }) => {
     }),
     async (req, res) => {
       const { userId } = req.params
-
       const [user] = await db("users").where({ id: userId })
 
       if (!user) {
@@ -92,7 +88,7 @@ const makeUsersRoutes = ({ app, db }) => {
         return
       }
 
-      res.send({ result: user, count: 1 })
+      res.send(user)
     }
   )
   // UPDATE partial
@@ -104,9 +100,9 @@ const makeUsersRoutes = ({ app, db }) => {
       },
       body: {
         email: validateEmail,
-        password: validatePassword,
         username: validateUsername,
         displayName: validateDisplayName,
+        password: validatePassword,
       },
     }),
     async (req, res) => {
@@ -125,15 +121,14 @@ const makeUsersRoutes = ({ app, db }) => {
 
       try {
         const [updatedUser] = await db("users")
+          .where({ id: userId })
           .update({
             email,
             username,
             displayName,
             passwordHash: password,
             passwordSalt: password,
-            updatedAt: new Date(),
           })
-          .where({ id: userId })
           .returning("*")
 
         res.send(updatedUser)
@@ -141,9 +136,7 @@ const makeUsersRoutes = ({ app, db }) => {
         if (err.code === "23505") {
           res.status(409).send({
             error: [
-              `Duplicated entry for: "${
-                err.constraint.split("_").slice(-2, -1)[0]
-              }"`,
+              `Duplicated value for "${err.detail.match(/^Key \((\w+)\)/)[1]}"`,
             ],
           })
 
@@ -153,8 +146,31 @@ const makeUsersRoutes = ({ app, db }) => {
         // eslint-disable-next-line no-console
         console.error(err)
 
-        res.status(500).send({ error: ["Something went wrong."] })
+        res.status(500).send({ error: "Oops. Something went wrong." })
       }
+    }
+  )
+  // DELETE
+  app.delete(
+    "/users/:userId",
+    validate({
+      params: {
+        userId: validateId.required(),
+      },
+    }),
+    async (req, res) => {
+      const { userId } = req.params
+      const [user] = await db("users").where({ id: userId })
+
+      if (!user) {
+        res.status(404).send({ error: ["User not found."] })
+
+        return
+      }
+
+      await db("users").delete().where({ id: userId })
+
+      res.send(user)
     }
   )
 }
