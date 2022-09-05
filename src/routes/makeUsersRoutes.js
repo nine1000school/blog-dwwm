@@ -140,6 +140,7 @@ const makeUsersRoutes = ({ app, db }) => {
             displayName,
             passwordHash,
             passwordSalt,
+            updatedAt : new Date(),
           })
           .returning("*")
 
