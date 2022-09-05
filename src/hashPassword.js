@@ -6,9 +6,10 @@ const hashPassword = (
   salt = randomBytes(128).toString("hex"),
   iterations = config.security.password.iterations,
   keylen = config.security.password.keylen,
-  digest = config.security.password.digest
+  digest = config.security.password.digest,
+  pepper = config.security.password.pepper
 ) => [
-  pbkdf2Sync(password, salt, iterations, keylen, digest).toString("hex"),
+  pbkdf2Sync(`${pepper}${password}`, salt, iterations, keylen, digest).toString("hex"),
   salt,
 ]
 
