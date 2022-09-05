@@ -22,6 +22,14 @@ const config = {
       stub: "./src/db/migration.stub",
     },
   },
+  security: {
+    password: {
+      iterations: 100000,
+      keylen: 256,
+      digest: "sha512",
+      pepper: process.env.SECURITY_PASSWORD_PEPPER,
+    },
+  },
 }
 
 export default config

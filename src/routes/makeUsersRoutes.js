@@ -1,3 +1,4 @@
+import hashPassword from "../hashPassword.js"
 import validate from "../middlewares/validate.js"
 import {
   validateDisplayName,
@@ -23,6 +24,7 @@ const makeUsersRoutes = ({ app, db }) => {
     }),
     async (req, res) => {
       const { email, username, displayName, password } = req.body
+      const [passwordHash, passwordSalt] = hashPassword(password)
 
       try {
         const [user] = await db("users")
@@ -30,8 +32,8 @@ const makeUsersRoutes = ({ app, db }) => {
             email,
             username,
             displayName,
-            passwordHash: password,
-            passwordSalt: password,
+            passwordHash,
+            passwordSalt,
           })
           .returning("*")
 
@@ -119,6 +121,16 @@ const makeUsersRoutes = ({ app, db }) => {
         return
       }
 
+      let passwordHash
+      let passwordSalt
+
+      if (password) {
+        const [hash, salt] = hashPassword(password)
+
+        passwordHash = hash
+        passwordSalt = salt
+      }
+
       try {
         const [updatedUser] = await db("users")
           .where({ id: userId })
@@ -126,8 +138,8 @@ const makeUsersRoutes = ({ app, db }) => {
             email,
             username,
             displayName,
-            passwordHash: password,
-            passwordSalt: password,
+            passwordHash,
+            passwordSalt,
           })
           .returning("*")
 
