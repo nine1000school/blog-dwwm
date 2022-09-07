@@ -11,9 +11,11 @@ const makePostsRoutes = ({ app, db }) => {
     "/posts",
     auth,
     validate({
-      title: validatePostTitle.required(),
-      content: validatePostContent.required(),
-      publishedAt: validatePublishedAt,
+      body: {
+        title: validatePostTitle.required(),
+        content: validatePostContent.required(),
+        publishedAt: validatePublishedAt,
+      },
     }),
     async (req, res) => {
       const {
