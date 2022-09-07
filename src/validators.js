@@ -44,3 +44,15 @@ export const validateOffset = yup
   .label("Pagination offset")
 
 export const validateId = yup.number().integer().min(1).label("User ID")
+
+export const validateEmailOrUsername = yup
+  .string()
+  .min(2)
+  .trim()
+  .label("Email or Username")
+
+export const validatePostTitle = yup.string().min(1).label("Title")
+
+export const validatePostContent = yup.string().min(1).label("Content")
+
+export const validatePublishedAt = yup.date().label("Publishing date")

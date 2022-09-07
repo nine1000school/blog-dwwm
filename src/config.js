@@ -29,6 +29,10 @@ const config = {
       digest: "sha512",
       pepper: process.env.SECURITY_PASSWORD_PEPPER,
     },
+    jwt: {
+      expiresIn: "2 days",
+      secret: process.env.SECURITY_JWT_SECRET,
+    },
   },
 }
 
