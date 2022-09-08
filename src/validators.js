@@ -51,8 +51,14 @@ export const validateEmailOrUsername = yup
   .trim()
   .label("Email or Username")
 
+export const validateContent = yup.string().min(1).label("Content")
+
 export const validatePostTitle = yup.string().min(1).label("Title")
 
-export const validatePostContent = yup.string().min(1).label("Content")
+export const validatePostContent = validateContent.label("Post content")
 
 export const validatePublishedAt = yup.date().label("Publishing date")
+
+export const validateSearch = yup.string().min(3).label("Search terms")
+
+export const validateCommentContent = validateContent.label("Comment content")

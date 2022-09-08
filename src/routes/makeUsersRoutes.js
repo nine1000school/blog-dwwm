@@ -1,3 +1,4 @@
+import filterDBResult from "../filterDBResult.js"
 import hashPassword from "../hashPassword.js"
 import validate from "../middlewares/validate.js"
 import {
@@ -37,7 +38,7 @@ const makeUsersRoutes = ({ app, db }) => {
           })
           .returning("*")
 
-        res.send(user) // filter sensitive data
+        res.send({ result: filterDBResult([user]), count: 1 }) // filter sensitive data
       } catch (err) {
         if (err.code === "23505") {
           res.status(409).send({
@@ -68,8 +69,9 @@ const makeUsersRoutes = ({ app, db }) => {
     async (req, res) => {
       const { limit, offset } = req.query
       const users = await db("users").limit(limit).offset(offset)
+      const [{ count }] = await db("users").count()
 
-      res.send(users)
+      res.send({ result: filterDBResult(users), count })
     }
   )
   // READ single
@@ -90,7 +92,7 @@ const makeUsersRoutes = ({ app, db }) => {
         return
       }
 
-      res.send(user)
+      res.send({ result: filterDBResult([user]), count: 1 })
     }
   )
   // UPDATE partial
@@ -140,11 +142,11 @@ const makeUsersRoutes = ({ app, db }) => {
             displayName,
             passwordHash,
             passwordSalt,
-            updatedAt : new Date(),
+            updatedAt: new Date(),
           })
           .returning("*")
 
-        res.send(updatedUser)
+        res.send({ result: updatedUser, count: 1 })
       } catch (err) {
         if (err.code === "23505") {
           res.status(409).send({
@@ -183,7 +185,7 @@ const makeUsersRoutes = ({ app, db }) => {
 
       await db("users").delete().where({ id: userId })
 
-      res.send(user)
+      res.send({ result: filterDBResult([user]), count: 1 })
     }
   )
 }
