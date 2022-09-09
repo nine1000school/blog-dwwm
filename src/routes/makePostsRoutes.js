@@ -54,8 +54,12 @@ const makePostsRoutes = ({ app, db }) => {
     }),
     async (req, res) => {
       const { limit, offset, userId, search } = req.query
-      const postsQuery = db("posts").limit(limit).offset(offset)
-      const countQuery = db("posts").count()
+      const postsQuery = db("posts")
+        .limit(limit)
+        .offset(offset)
+        .whereNotNull("publishedAt")
+        .orderBy("publishedAt", "DESC")
+      const countQuery = db("posts").count().whereNotNull("publishedAt")
 
       if (userId) {
         postsQuery.where({ userId })
@@ -107,6 +111,7 @@ const makePostsRoutes = ({ app, db }) => {
   // UPDATE partial
   app.patch(
     "/posts/:postId",
+    // auth,
     validate({
       params: {
         postId: validateId.required(),
@@ -131,12 +136,15 @@ const makePostsRoutes = ({ app, db }) => {
         return
       }
 
-      const [updatedPost] = await db("posts").where({ id: postId }).update({
-        title,
-        content,
-        publishedAt,
-        updatedAt: new Date(),
-      })
+      const [updatedPost] = await db("posts")
+        .where({ id: postId })
+        .update({
+          title,
+          content,
+          publishedAt,
+          updatedAt: new Date(),
+        })
+        .returning("*")
 
       res.send({ result: [updatedPost], count: 1 })
     }
