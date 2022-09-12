@@ -1,4 +1,10 @@
-const hiddenFields = ["passwordHash", "passwordSalt"]
+const hiddenFields = [
+  "passwordHash",
+  "passwordSalt",
+  "email",
+  "createdAt",
+  "updatedAt",
+]
 
 const filterDBResult = (rows) =>
   rows.map((row) =>
