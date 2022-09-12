@@ -127,7 +127,22 @@ const makePostsRoutes = ({ app, db }) => {
         return
       }
 
-      res.send({ result: [post], count: 1 })
+      const formattedPost = Object.entries(post).reduce(
+        (xs, [key, value]) => {
+          if (key.startsWith("users:")) {
+            xs.user[key.slice(6)] = value
+
+            return xs
+          }
+
+          xs[key] = value
+
+          return xs
+        },
+        { user: {} }
+      )
+
+      res.send({ result: [formattedPost], count: 1 })
     }
   )
   // UPDATE partial

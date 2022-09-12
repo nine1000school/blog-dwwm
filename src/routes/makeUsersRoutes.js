@@ -53,7 +53,7 @@ const makeUsersRoutes = ({ app, db }) => {
         // eslint-disable-next-line no-console
         console.error(err)
 
-        res.status(500).send({ error: "Oops. Something went wrong." })
+        res.status(500).send({ error: ["Oops. Something went wrong."] })
       }
     }
   )
