@@ -6,6 +6,6 @@ export const up = async (knex) => {
 
 export const down = async (knex) => {
   await knex.schema.alterTable("users", (table) => {
-    table.dropCollum("role")
+    table.dropColumn("role")
   })
 }
