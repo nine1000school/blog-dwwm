@@ -8,13 +8,16 @@ const validate = (validators) => async (req, res, next) => {
   })
 
   try {
-    const { params, query, body } = await validationSchema.validate(req, {
-      abortEarly: false,
-    })
+    const { params, query, body } = await validationSchema.validate(
+      req.locals,
+      {
+        abortEarly: false,
+      }
+    )
 
-    req.params = params
-    req.query = query
-    req.body = body
+    req.locals.params = params
+    req.locals.query = query
+    req.locals.body = body
   } catch (err) {
     res.status(420).send({ error: err.errors })
 

@@ -4,6 +4,7 @@ const hiddenFields = [
   "email",
   "createdAt",
   "updatedAt",
+  "isAdmin"
 ]
 
 const filterDBResult = (rows) =>

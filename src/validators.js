@@ -62,3 +62,8 @@ export const validatePublishedAt = yup.date().label("Publishing date")
 export const validateSearch = yup.string().min(3).label("Search terms")
 
 export const validateCommentContent = validateContent.label("Comment content")
+
+export const validateLocation = yup.string().min(3).label("Localisation of race")
+export const validateDate = yup.date().label("Race date")
+export const validateRaceName = yup.string().min(3).label("Race name")
+export const validateRole = yup.string().min(4).label("Role")

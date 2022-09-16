@@ -1,10 +1,11 @@
 import jsonwebtoken from "jsonwebtoken"
 import config from "../config.js"
-import hashPassword from "../hashPassword.js"
+import User from "../db/models/User.js"
 import validate from "../middlewares/validate.js"
+import { send401 } from "../utils/http.js"
 import { validateEmailOrUsername, validatePassword } from "../validators.js"
 
-const makeSessionRoutes = ({ app, db }) => {
+const makeSessionRoutes = ({ app }) => {
   app.post(
     "/sign-in",
     validate({
@@ -20,8 +21,8 @@ const makeSessionRoutes = ({ app, db }) => {
         return
       }
 
-      const [user] = await db("users")
-        .where({
+      const user = await User.query()
+        .findOne({
           email: emailOrUsername,
         })
         .orWhere({
@@ -29,15 +30,13 @@ const makeSessionRoutes = ({ app, db }) => {
         })
 
       if (!user) {
-        res.status(401).send({ error: ["Invalid credentials."] })
+        send401(res)
 
         return
       }
 
-      const [passwordHash] = hashPassword(password, user.passwordSalt)
-
-      if (passwordHash !== user.passwordHash) {
-        res.status(401).send({ error: ["Invalid credentials."] })
+      if (!user.checkPassword(password)) {
+        send401(res)
 
         return
       }
@@ -49,6 +48,7 @@ const makeSessionRoutes = ({ app, db }) => {
               id: user.id,
               displayName: user.displayName,
               username: user.username,
+              role: user.role,
             },
           },
         },
