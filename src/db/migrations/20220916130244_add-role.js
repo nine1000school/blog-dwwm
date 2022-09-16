@@ -1,6 +1,6 @@
 export const up = async (knex) => {
   await knex.schema.alterTable("users", (table) => {
-    table.text("role").notNullable().default("READER")
+    table.text("role").notNullable().default("USER")
   })
 }
 
