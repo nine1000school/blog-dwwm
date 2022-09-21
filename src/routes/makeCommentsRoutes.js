@@ -131,6 +131,7 @@ const makeCommentsRoutes = ({ app, db }) => {
           content,
           updatedAt: new Date(),
         })
+        .returning("*")
 
       res.send({ result: [updatedComment], count: 1 })
     }

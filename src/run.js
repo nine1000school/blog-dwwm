@@ -2,8 +2,10 @@ import cors from "cors"
 import express from "express"
 import knex from "knex"
 import config from "./config.js"
+import makeCircuitsRoutes from "./routes/makeCircuitRoutes.js"
 import makeCommentsRoutes from "./routes/makeCommentsRoutes.js"
 import makePostsRoutes from "./routes/makePostsRoutes.js"
+import makeSeasonsRoutes from "./routes/makeSeasonRoutes.js"
 import makeSessionRoutes from "./routes/makeSessionRoutes.js"
 import makeUsersRoutes from "./routes/makeUsersRoutes.js"
 
@@ -17,6 +19,8 @@ makeUsersRoutes({ app, db })
 makeSessionRoutes({ app, db })
 makePostsRoutes({ app, db })
 makeCommentsRoutes({ app, db })
+makeCircuitsRoutes({ app, db })
+makeSeasonsRoutes({ app, db })
 
 app.listen(config.server.port, () =>
   // eslint-disable-next-line no-console
