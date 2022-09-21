@@ -1,7 +1,13 @@
 import filterDBResult from "../filterDBResult.js"
 import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
-import { validateId, validateLimit, validateOffset } from "../validators.js"
+import {
+  validateId,
+  validateLimit,
+  validateNumberOfTurn,
+  validateOffset,
+  validateUsername,
+} from "../validators.js"
 
 const makeEventsRoutes = ({ app, db }) => {
   // CREATE
@@ -110,11 +116,11 @@ const makeEventsRoutes = ({ app, db }) => {
         eventId: validateId.required(),
       },
       body: {
-        // point: validateUsername,
-        // pinalty: validateUsername,
-        // abord: validateNumberOfTurn,
-        // crash: validateNumberOfTurn,
-        // puncture: validateNumberOfTurn,
+        point: validateUsername,
+        pinalty: validateUsername,
+        abord: validateNumberOfTurn,
+        crash: validateNumberOfTurn,
+        puncture: validateNumberOfTurn,
       },
     }),
     async (req, res) => {
