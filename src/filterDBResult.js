@@ -1,7 +1,7 @@
 const hiddenFields = [
   "passwordHash",
   "passwordSalt",
-  "email",
+  // "email",
   "createdAt",
   "updatedAt",
 ]

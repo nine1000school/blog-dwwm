@@ -49,6 +49,8 @@ const makeSessionRoutes = ({ app, db }) => {
               id: user.id,
               displayName: user.displayName,
               username: user.username,
+              email: user.email,
+              role: user.role,
             },
           },
         },
