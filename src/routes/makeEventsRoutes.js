@@ -16,11 +16,11 @@ const makeEventsRoutes = ({ app, db }) => {
     auth,
     validate({
       body: {
-        // point: validateUsername.required(),
-        // pinalty: validateUsername.required(),
-        // abord: validateNumberOfTurn.required(),
-        // crash: validateNumberOfTurn.required(),
-        // puncture: validateNumberOfTurn.required(),
+        point: validateUsername.required(),
+        pinalty: validateUsername.required(),
+        abord: validateNumberOfTurn.required(),
+        crash: validateNumberOfTurn.required(),
+        puncture: validateNumberOfTurn.required(),
       },
     }),
     async (req, res) => {
