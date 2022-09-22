@@ -1,3 +1,4 @@
+import Post from "../db/models/Post.js"
 import filterDBResult from "../filterDBResult.js"
 import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
@@ -53,19 +54,14 @@ const makePostsRoutes = ({ app, db }) => {
       },
     }),
     async (req, res) => {
-      const { limit, offset, userId, search } = req.query
-      const postsQuery = db("posts")
-        .select(
-          "posts.*",
-          "users.id AS users:id",
-          "users.displayName AS users:displayName"
-        )
-        .innerJoin("users", "users.id", "=", "posts.userId")
+      const { limit, offset, userId, search } = req.locals.query
+      const postsQuery = Post.query()
+        .withGraphFetched("author")
         .limit(limit)
         .offset(offset)
         .whereNotNull("publishedAt")
         .orderBy("publishedAt", "DESC")
-      const countQuery = db("posts").count().whereNotNull("publishedAt")
+      const countQuery = Post.query().count().whereNotNull("publishedAt")
 
       if (userId) {
         postsQuery.where({ userId })
@@ -86,24 +82,8 @@ const makePostsRoutes = ({ app, db }) => {
         )
       }
 
-      const posts = (await postsQuery).map((post) =>
-        Object.entries(post).reduce(
-          (xs, [key, value]) => {
-            if (key.startsWith("users:")) {
-              xs.user[key.slice(6)] = value
-
-              return xs
-            }
-
-            xs[key] = value
-
-            return xs
-          },
-          { user: {} }
-        )
-      )
-
       const [{ count }] = await countQuery
+      const posts = await postsQuery
 
       res.send({ result: filterDBResult(posts), count })
     }

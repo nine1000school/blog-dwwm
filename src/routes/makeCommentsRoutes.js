@@ -50,7 +50,7 @@ const makeCommentsRoutes = ({ app, db }) => {
       },
     }),
     async (req, res) => {
-      const { limit, offset, userId, postId, search } = req.query
+      const { limit, offset, userId, postId, search } = req.locals.query
       const commentsQuery = db("comments").limit(limit).offset(offset)
       const countQuery = db("comments").count()
 

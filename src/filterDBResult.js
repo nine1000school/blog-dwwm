@@ -2,6 +2,7 @@ const hiddenFields = [
   "passwordHash",
   "passwordSalt",
   "email",
+  "role",
   "createdAt",
   "updatedAt",
 ]
@@ -9,7 +10,21 @@ const hiddenFields = [
 const filterDBResult = (rows) =>
   rows.map((row) =>
     Object.fromEntries(
-      Object.entries(row).filter(([field]) => !hiddenFields.includes(field))
+      Object.entries(row)
+        .filter(([field]) => !hiddenFields.includes(field))
+        .map(([field, value]) => {
+          const type = typeof value
+
+          if (["string", "number", "boolean"].includes(type) || !value) {
+            return [field, value]
+          }
+
+          if (Array.isArray(value)) {
+            return [field, filterDBResult(value)]
+          }
+
+          return [field, ...filterDBResult([value])]
+        })
     )
   )
 
