@@ -6,7 +6,7 @@ class Post extends Model {
 
   static get relationMappings() {
     return {
-      author: {
+      user: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {

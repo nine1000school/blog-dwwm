@@ -56,7 +56,7 @@ const makePostsRoutes = ({ app, db }) => {
     async (req, res) => {
       const { limit, offset, userId, search } = req.locals.query
       const postsQuery = Post.query()
-        .withGraphFetched("author")
+        .withGraphFetched("user")
         .limit(limit)
         .offset(offset)
         .whereNotNull("publishedAt")
@@ -78,7 +78,7 @@ const makePostsRoutes = ({ app, db }) => {
         countQuery.where((query) =>
           query
             .whereILike("title", searchPattern)
-            .orWhereILike("content", searchPattern)
+            .gorWhereILike("content", searchPattern)
         )
       }
 

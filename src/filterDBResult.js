@@ -13,9 +13,11 @@ const filterDBResult = (rows) =>
       Object.entries(row)
         .filter(([field]) => !hiddenFields.includes(field))
         .map(([field, value]) => {
-          const type = typeof value
-
-          if (["string", "number", "boolean"].includes(type) || !value) {
+          if (
+            value instanceof Date ||
+            ["string", "number", "boolean"].includes(typeof value) ||
+            !value
+          ) {
             return [field, value]
           }
 
