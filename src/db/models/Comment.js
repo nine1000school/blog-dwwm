@@ -19,7 +19,7 @@ class Comment extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Race,
         join: {
-          from: "race.commentId",
+          from: "comments.raceId",
           to: "comments.id",
         },
       },

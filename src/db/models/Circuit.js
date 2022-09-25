@@ -6,7 +6,7 @@ class Circuit extends Model {
 
   static get relationMappings() {
     return {
-      race: {
+      races: {
         relation: Model.HasManyRelation,
         modelClass: Race,
         join: {

@@ -22,7 +22,7 @@ class Race extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Season,
         join: {
-          from: "season.raceId",
+          from: "races.seasonId",
           to: "seasons.id",
         },
       },
@@ -30,7 +30,7 @@ class Race extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Circuit,
         join: {
-          from: "circuit.raceId",
+          from: "races.circuitId",
           to: "circuits.id",
         }
       },
@@ -39,6 +39,10 @@ class Race extends Model {
         modelClass: Driver,
         join: {
           from: "races.id",
+          through: {
+            from: "races_drivers.raceId",
+            to: "races_drivers.driverId",
+          },
           to: "drivers.raceId",
         }
       },
@@ -46,7 +50,7 @@ class Race extends Model {
         relation: Model.HasManyRelation,
         modelClass: RaceEvent,
         join: {
-          from: "events.id",
+          from: "races.id",
           to: "events.raceId",
         }
       },

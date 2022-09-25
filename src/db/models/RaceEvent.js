@@ -7,11 +7,11 @@ class RaceEvent extends Model {
   static get relationMappings() {
     return {
       race: {
-        relation: Model.HasOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Race,
         join: {
-          from: "events.id",
-          to: "races.eventId",
+          from: "events.raceId",
+          to: "events.id",
         }
       }
     }

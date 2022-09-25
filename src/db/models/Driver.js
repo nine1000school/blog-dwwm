@@ -11,8 +11,8 @@ class Driver extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Race,
         join: {
-          from: "race.eventId",
-          to: "events.id",
+          from: "race.driverId",
+          to: "driver.id",
         }
       },
       team: {
@@ -20,7 +20,7 @@ class Driver extends Model {
         modelClass: Team,
         join: {
           from: "drivers.id",
-          to: "teams.driverId",
+          to: "drivers.teamId",
         }
       }
     }
