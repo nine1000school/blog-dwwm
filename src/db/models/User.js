@@ -1,18 +1,18 @@
 import { Model } from "objection"
 import hashPassword from "../../hashPassword.js"
-import Post from "./Post.js"
+import Comment from "./Comment.js"
 
 class User extends Model {
   static tableName = "users"
 
   static get relationMappings() {
     return {
-      posts: {
+      comments: {
         relation: Model.HasManyRelation,
-        modelClass: Post,
+        modelClass: Comment,
         join: {
           from: "users.id",
-          to: "posts.userId",
+          to: "comments.userId",
         },
       },
     }
