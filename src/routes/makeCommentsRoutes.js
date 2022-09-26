@@ -14,22 +14,22 @@ const makeCommentsRoutes = ({ app, db }) => {
   app.post(
     "/comments",
     auth,
-    validate({
-      body: {
-        postId: validateId.required(),
-        content: validateCommentContent.required(),
-      },
-    }),
+    // validate({
+    //   body: {
+    //     raceId: validateId.required(),
+    //     content: validateCommentContent.required(),
+    //   },
+    // }),
     async (req, res) => {
       const {
-        body: { content, postId },
+        body: { content, raceId },
         session: { user },
       } = req
 
       const [comment] = await db("comments")
         .insert({
           content,
-          postId,
+          raceId,
           userId: user.id,
         })
         .returning("*")
@@ -45,18 +45,18 @@ const makeCommentsRoutes = ({ app, db }) => {
         limit: validateLimit,
         offset: validateOffset,
         userId: validateId,
-        postId: validateId,
+        raceId: validateId,
         search: validateSearch,
       },
     }),
     async (req, res) => {
-      const { limit, offset, userId, postId, search } = req.query
+      const { limit, offset, userId, raceId, search } = req.query
       const commentsQuery = db("comments").limit(limit).offset(offset)
       const countQuery = db("comments").count()
 
-      if (postId) {
-        commentsQuery.where({ postId })
-        countQuery.where({ postId })
+      if (raceId) {
+        commentsQuery.where({ raceId })
+        countQuery.where({ raceId })
       }
 
       if (userId) {
