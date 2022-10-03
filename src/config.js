@@ -23,6 +23,7 @@ const config = {
     },
   },
   security: {
+    uploadDirectory: process.env.TMPDIR,
     password: {
       iterations: 100000,
       keylen: 256,

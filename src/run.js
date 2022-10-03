@@ -7,6 +7,7 @@ import handleErrrors from "./middlewares/handleErrors.js"
 import makeCommentsRoutes from "./routes/makeCommentsRoutes.js"
 import makePostsRoutes from "./routes/makePostsRoutes.js"
 import makeSessionRoutes from "./routes/makeSessionRoutes.js"
+import makeUploadRoutes from "./routes/makeUploadRoutes.js"
 import makeUsersRoutes from "./routes/makeUsersRoutes.js"
 
 const app = express()
@@ -15,7 +16,6 @@ const db = knex(config.db)
 Model.knex(db)
 
 app.use(cors())
-app.use(express.json())
 
 app.use((req, res, next) => {
   req.locals = {
@@ -36,7 +36,8 @@ app.get("/categories/:categoryId/products/:productId", (req, res) =>
   )
 )
 
-makeUsersRoutes({ app, db })
+makeUploadRoutes({ app })
+makeUsersRoutes({ app })
 makeSessionRoutes({ app, db })
 makePostsRoutes({ app, db })
 makeCommentsRoutes({ app, db })

@@ -1,3 +1,4 @@
+import express from "express"
 import jsonwebtoken from "jsonwebtoken"
 import config from "../config.js"
 import User from "../db/models/User.js"
@@ -8,6 +9,7 @@ import { validateEmailOrUsername, validatePassword } from "../validators.js"
 const makeSessionRoutes = ({ app }) => {
   app.post(
     "/sign-in",
+    express.json(),
     validate({
       emailOrUsername: validateEmailOrUsername.required(),
       password: validatePassword.required(),
