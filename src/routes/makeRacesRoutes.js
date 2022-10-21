@@ -78,6 +78,21 @@ const makeRacesRoutes = ({ app }) => {
     }
   )
 
+  app.get(
+    "/races/:circuitId",
+    validate({
+      params: {
+        circuitId: validateId.required(),
+      }
+    }),
+    async (req, res) => {
+      const { circuitId } = req.params
+      const race = await Race.query().findById(circuitId).throwIfNotFound()
+
+      res.send({ result: race, count:1 })
+    }
+  )
+
   app.patch(
     "/races/:raceId",
     validate({
