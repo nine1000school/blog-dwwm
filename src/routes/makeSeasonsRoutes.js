@@ -2,7 +2,6 @@ import Season from "../db/models/Season.js"
 import validate from "../middlewares/validate.js"
 import { validateDate, validateId, validateLimit, validateOffset, validateSeasonName } from "../validators.js"
 
-
 const makeSeasonRoutes = ({ app }) => {
   app.post(
     "/seasons",
@@ -36,10 +35,10 @@ const makeSeasonRoutes = ({ app }) => {
     }),
     async(req, res) => {
       const { limit, offset } = req.locals.query
-      const teams = await Season.query().limit(limit).offset(offset)
+      const seasons = await Season.query().limit(limit).offset(offset)
       const [{ count }] = await Season.query().count()
 
-      res.send({ result: teams , count})
+      res.send({ result: seasons , count})
     }
   )
 

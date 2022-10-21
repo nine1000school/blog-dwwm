@@ -7,6 +7,7 @@ import handleErrrors from "./middlewares/handleErrors.js"
 import makeCircuitsRoutes from "./routes/makeCircuitsRoutes.js"
 import makeCommentsRoutes from "./routes/makeCommentsRoutes.js"
 import makeDriversRoutes from "./routes/makeDriversRoutes.js"
+import makeEventsRoutes from "./routes/makeEventsRoutes.js"
 import makeRacesRoutes from "./routes/makeRacesRoutes.js"
 import makeSeasonRoutes from "./routes/makeSeasonsRoutes.js"
 import makeSessionRoutes from "./routes/makeSessionRoutes.js"
@@ -31,14 +32,7 @@ app.use((req, res, next) => {
   next()
 })
 
-// app.get("/products/:productId", (req, res) =>
-//   res.send(`Product #${req.params.productId}`)
-// )
-// app.get("/categories/:categoryId/products/:productId", (req, res) =>
-//   res.send(
-//     `Category #${req.params.categoryId} Product #${req.params.productId}`
-//   )
-// )
+// app.get("/users/:username", (req, res)=> res.send(` #${req.params.username})`))
 
 makeUsersRoutes({ app, db })
 makeSessionRoutes({ app, db })
@@ -48,6 +42,7 @@ makeTeamsRoutes({ app, db })
 makeSeasonRoutes({ app, db })
 makeDriversRoutes({ app, db })
 makeCircuitsRoutes({ app, db })
+makeEventsRoutes({ app, db })
 
 
 app.use(handleErrrors)

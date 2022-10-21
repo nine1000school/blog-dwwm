@@ -68,10 +68,10 @@ const makeCircuitsRoutes = ({ app }) => {
         circuitId: validateId.required()
       },
       body: {
-        name: validateCircuitName.required(),
-        location: validateLocation.required(),
-        length: validateLength.required(),
-        numberOfTurn: validateTurnNumbers.required(),
+        name: validateCircuitName,
+        location: validateLocation,
+        length: validateLength,
+        numberOfTurn: validateTurnNumbers,
       }
     }),
     async (req, res) => {
@@ -82,7 +82,7 @@ const makeCircuitsRoutes = ({ app }) => {
 
       const circuit = await Circuit.query().findById(circuitId).throwIfNotFound()
 
-      const updatedTeam = await circuit
+      const updatedCircuit = await circuit
         .$query()
         .patch({
           name,
@@ -92,7 +92,7 @@ const makeCircuitsRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updatedTeam, count: 1 })
+      res.send({ result: updatedCircuit, count: 1 })
     }
   )
 

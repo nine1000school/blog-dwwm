@@ -9,7 +9,7 @@ const validate = (validators) => async (req, res, next) => {
 
   try {
     const { params, query, body } = await validationSchema.validate(
-      req.locals,
+      req,
       {
         abortEarly: false,
       }

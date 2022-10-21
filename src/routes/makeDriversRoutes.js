@@ -79,7 +79,7 @@ const makeDriversRoutes = ({ app }) => {
 
       const driver = await Driver.query().findById(driverId).throwIfNotFound()
 
-      const updatedTeam = await driver
+      const updatedDriver = await driver
         .$query()
         .patch({
           name,
@@ -88,7 +88,7 @@ const makeDriversRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updatedTeam, count: 1 })
+      res.send({ result: updatedDriver, count: 1 })
     }
   )
 

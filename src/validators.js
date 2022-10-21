@@ -43,7 +43,7 @@ export const validateOffset = yup
   .default(0)
   .label("Pagination offset")
 
-export const validateId = yup.number().integer().min(1).label("User ID")
+export const validateId = yup.number().integer().min(1).label("ID")
 
 export const validateEmailOrUsername = yup
   .string()
@@ -63,7 +63,7 @@ export const validateSearch = yup.string().min(3).label("Search terms")
 
 export const validateCommentContent = validateContent.label("Comment content")
 
-export const validateLocation = yup.string().min(3).label("Localisation of race")
+export const validateLocation = yup.string().min(2).label("Localisation of race")
 export const validateDate = yup.date().label("Race date")
 export const validateRaceName = yup.string().min(3).label("Race name")
 export const validateRole = yup.string().min(4).label("Role")
@@ -74,3 +74,10 @@ export const validateDriverName = yup.string().min(4).label("Driver Name")
 export const validateCircuitName = yup.string().min(4).label("Circuit Name")
 export const validateLength = yup.number().min(1).label("Circuit Length")
 export const validateTurnNumbers = yup.number().min(1).label("Number of turn")
+export const validateEventPoint = yup.string().min(4).label("Event's Point")
+export const validateEventPenalty = yup.string().min(4).label("Event's penalty")
+export const validateEventAbord = yup.string().min(4).label("Event's abord")
+export const validateEventCrash = yup.string().min(4).label("Event's crash")
+export const validateEventPuncture = yup.string().min(4).label("Event's puncture")
+
+

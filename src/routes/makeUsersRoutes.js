@@ -11,6 +11,7 @@ import {
   validateLimit,
   validateOffset,
   validatePassword,
+  validateRole,
   validateUsername,
 } from "../validators.js"
 
@@ -126,7 +127,38 @@ const makeUsersRoutes = ({ app }) => {
         })
         .returning("*")
 
-      res.send({ result: updatedUser, count: 1 })
+      res.send({ result: filterDBResult([updatedUser]), count: 1 })
+    }
+  )
+  //PATCH ADMIN
+  app.patch(
+    "/users/:userId/role",
+    auth("ADMIN"),
+    validate({
+      params: {
+        userId: validateId.required()
+      },
+      body: {
+        role: validateRole.required(),
+      },
+    }),
+    async (req, res) => {
+      const {
+        params: { userId },
+        body: { role },
+      } = req
+
+      const user = await User.query().findById(userId).throwIfNotFound()
+
+      const updatedRole = await user
+        .$query()
+        .patch({  
+          role,  
+          updatedAt: new Date(),
+        })
+        .returning("*")
+
+      res.send({ result: updatedRole, count: 1 })
     }
   )
   // DELETE
