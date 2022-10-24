@@ -1,10 +1,12 @@
 import Driver from "../db/models/Driver.js"
+import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
 import { validateId, validateLimit, validateNationnality, validateOffset, validateDriverName } from "../validators.js"
 
 const makeDriversRoutes = ({ app }) => {
   app.post(
     "/drivers",
+    auth("ADMIN"),
     validate({
       body: {
         name: validateDriverName.required(),
@@ -29,6 +31,7 @@ const makeDriversRoutes = ({ app }) => {
 
   app.get(
     "/drivers",
+    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
@@ -46,6 +49,7 @@ const makeDriversRoutes = ({ app }) => {
 
   app.get(
     "/drivers/:name",
+    auth("ADMIN"),
     validate({
       params: {
         name: validateDriverName.required(),
@@ -61,6 +65,7 @@ const makeDriversRoutes = ({ app }) => {
 
   app.patch(
     "/drivers/:driverId",
+    auth("ADMIN"),
     validate({
       params: {
         driverId: validateId.required()
@@ -94,6 +99,7 @@ const makeDriversRoutes = ({ app }) => {
 
   app.delete(
     "/drivers/:driverId",
+    auth("ADMIN"),
     validate({
       params: {
         driverId: validateId.required(),

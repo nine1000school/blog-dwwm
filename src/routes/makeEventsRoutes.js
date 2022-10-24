@@ -1,10 +1,12 @@
 import RaceEvent from "../db/models/RaceEvent.js"
+import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
 import { validateEventAbord, validateEventCrash, validateEventPenalty, validateEventPoint, validateEventPuncture, validateId, validateLimit, validateOffset } from "../validators.js"
 
 const makeEventsRoutes = ({ app }) => {
   app.post(
     "/events",
+    auth("ADMIN"),
     validate({
       body: {
         point: validateEventPoint.required(),
@@ -35,6 +37,7 @@ const makeEventsRoutes = ({ app }) => {
 
   app.get(
     "/events",
+    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
@@ -52,6 +55,7 @@ const makeEventsRoutes = ({ app }) => {
 
   app.get(
     "/events/:eventId",
+    auth("ADMIN"),
     validate({
       params: {
         eventId: validateId.required(),
@@ -67,6 +71,7 @@ const makeEventsRoutes = ({ app }) => {
 
   app.patch(
     "/events/:eventId",
+    auth("ADMIN"),
     validate({
       params: {
         eventId: validateId.required()
@@ -106,6 +111,7 @@ const makeEventsRoutes = ({ app }) => {
 
   app.delete(
     "/events/:eventId",
+    auth("ADMIN"),
     validate({
       params: {
         eventId: validateId.required(),

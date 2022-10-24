@@ -1,10 +1,12 @@
 import Circuit from "../db/models/Circuit.js"
+import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
 import { validateCircuitName, validateId, validateLength, validateLimit, validateLocation, validateOffset, validateTurnNumbers } from "../validators.js"
 
 const makeCircuitsRoutes = ({ app }) => {
   app.post(
     "/circuits",
+    auth("ADMIN"),
     validate({
       body: {
         name: validateCircuitName.required(),
@@ -31,6 +33,7 @@ const makeCircuitsRoutes = ({ app }) => {
 
   app.get(
     "/circuits",
+    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
@@ -48,6 +51,7 @@ const makeCircuitsRoutes = ({ app }) => {
 
   app.get(
     "/circuits/:name",
+    auth("ADMIN"),
     validate({
       params: {
         name: validateCircuitName.required(),
@@ -63,6 +67,7 @@ const makeCircuitsRoutes = ({ app }) => {
 
   app.patch(
     "/circuits/:circuitId",
+    auth("ADMIN"),
     validate({
       params: {
         circuitId: validateId.required()
@@ -98,6 +103,7 @@ const makeCircuitsRoutes = ({ app }) => {
 
   app.delete(
     "/circuits/:circuitId",
+    auth("ADMIN"),
     validate({
       params: {
         circuitId: validateId.required(),

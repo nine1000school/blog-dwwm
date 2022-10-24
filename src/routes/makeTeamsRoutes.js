@@ -1,10 +1,12 @@
 import Team from "../db/models/Team.js"
+import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
 import { validateId, validateLimit, validateNationnality, validateOffset, validateTeamName } from "../validators.js"
 
 const makeTeamsRoutes = ({ app }) => {
   app.post(
     "/teams",
+    auth("ADMIN"),
     validate({
       body: {
         name: validateTeamName.required(),
@@ -27,6 +29,7 @@ const makeTeamsRoutes = ({ app }) => {
 
   app.get(
     "/teams",
+    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
@@ -44,6 +47,7 @@ const makeTeamsRoutes = ({ app }) => {
 
   app.get(
     "/teams/:name",
+    auth("ADMIN"),
     validate({
       params: {
         name: validateTeamName.required(),
@@ -59,6 +63,7 @@ const makeTeamsRoutes = ({ app }) => {
 
   app.patch(
     "/teams/:teamId",
+    auth("ADMIN"),
     validate({
       params: {
         teamId: validateId.required()
@@ -90,6 +95,7 @@ const makeTeamsRoutes = ({ app }) => {
 
   app.delete(
     "/teams/:teamId",
+    auth("ADMIN"),
     validate({
       params: {
         teamId: validateId.required(),

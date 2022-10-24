@@ -1,10 +1,12 @@
 import Race from "../db/models/Race.js"
+import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
 import { validateId, validateLimit, validateOffset, validateDriverName, validateRaceName, validateLocation, validateDate } from "../validators.js"
 
 const makeRacesRoutes = ({ app }) => {
   app.post(
     "/races",
+    auth("ADMIN"),
     validate({
       body: {
         name: validateRaceName.required(),
@@ -33,6 +35,7 @@ const makeRacesRoutes = ({ app }) => {
 
   app.get(
     "/races",
+    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
@@ -50,6 +53,7 @@ const makeRacesRoutes = ({ app }) => {
 
   app.get(
     "/races/:name",
+    auth("ADMIN"),
     validate({
       params: {
         name: validateDriverName.required(),
@@ -65,6 +69,7 @@ const makeRacesRoutes = ({ app }) => {
 
   app.get(
     "/races/season/:seasonId",
+    auth("ADMIN"),
     validate({
       params: {
         seasonId: validateId.required(),
@@ -82,6 +87,7 @@ const makeRacesRoutes = ({ app }) => {
 
   app.get(
     "/races/circuit/:circuitId",
+    auth("ADMIN"),
     validate({
       params: {
         circuitId: validateId.required(),
@@ -99,6 +105,7 @@ const makeRacesRoutes = ({ app }) => {
 
   app.patch(
     "/races/:raceId",
+    auth("ADMIN"),
     validate({
       params: {
         raceId: validateId.required(),
@@ -136,6 +143,7 @@ const makeRacesRoutes = ({ app }) => {
 
   app.delete(
     "/races/:raceId",
+    auth("ADMIN"),
     validate({
       params: {
         raceId: validateId.required(),

@@ -1,10 +1,12 @@
 import Season from "../db/models/Season.js"
+import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
 import { validateDate, validateId, validateLimit, validateOffset, validateSeasonName } from "../validators.js"
 
 const makeSeasonRoutes = ({ app }) => {
   app.post(
     "/seasons",
+    auth("ADMIN"),
     validate({
       body: {
         name: validateSeasonName.required(),
@@ -27,6 +29,7 @@ const makeSeasonRoutes = ({ app }) => {
 
   app.get(
     "/seasons",
+    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
@@ -44,6 +47,7 @@ const makeSeasonRoutes = ({ app }) => {
 
   app.get(
     "/seasons/:year",
+    auth("ADMIN"),
     validate({
       params: {
         date: validateDate.required(),
@@ -59,6 +63,7 @@ const makeSeasonRoutes = ({ app }) => {
 
   app.patch(
     "/seasons/:seasonId",
+    auth("ADMIN"),
     validate({
       params: {
         seasonId: validateId.required()
@@ -90,6 +95,7 @@ const makeSeasonRoutes = ({ app }) => {
 
   app.delete(
     "/seasons/:seasonId",
+    auth("ADMIN"),
     validate({
       params: {
         seasonId: validateId.required(),
