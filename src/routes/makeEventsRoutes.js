@@ -61,7 +61,7 @@ const makeEventsRoutes = ({ app }) => {
       const { eventId } = req.params
       const event = await RaceEvent.query().findOne({ eventId }).throwIfNotFound()
 
-      res.send({ result: event, count:1 })
+      res.send({ result: event })
     }
   )
 
@@ -100,7 +100,7 @@ const makeEventsRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updatedEvent, count: 1 })
+      res.send({ result: updatedEvent })
     }
   )
 

@@ -53,7 +53,7 @@ const makeTeamsRoutes = ({ app }) => {
       const { name } = req.params
       const team = await Team.query().findOne({ name }).throwIfNotFound()
 
-      res.send({ result: team, count:1 })
+      res.send({ result: team })
     }
   )
 
@@ -84,7 +84,7 @@ const makeTeamsRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updatedTeam, count: 1 })
+      res.send({ result: updatedTeam })
     }
   )
 

@@ -62,7 +62,7 @@ const makeCommentsRoutes = ({ app }) => {
 
       const comment = await Comment.query().findById(commentId).throwIfNotFound()
 
-      res.send({ result: comment, count:1 })
+      res.send({ result: comment })
     }
   )
   
@@ -102,7 +102,7 @@ const makeCommentsRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updatedSeason, count: 1 })
+      res.send({ result: updatedSeason })
     }
   )
 

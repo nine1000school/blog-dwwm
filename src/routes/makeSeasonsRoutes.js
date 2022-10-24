@@ -53,7 +53,7 @@ const makeSeasonRoutes = ({ app }) => {
       const { date } = req.params
       const season = await Season.query().findOne({ date }).throwIfNotFound()
 
-      res.send({ result: season, count:1 })
+      res.send({ result: season })
     }
   )
 
@@ -84,7 +84,7 @@ const makeSeasonRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updatedSeason, count: 1 })
+      res.send({ result: updatedSeason })
     }
   )
 

@@ -55,7 +55,7 @@ const makeDriversRoutes = ({ app }) => {
       const { name } = req.params
       const driver = await Driver.query().findOne({ name }).throwIfNotFound()
 
-      res.send({ result: driver, count:1 })
+      res.send({ result: driver })
     }
   )
 
@@ -88,7 +88,7 @@ const makeDriversRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updatedDriver, count: 1 })
+      res.send({ result: updatedDriver })
     }
   )
 

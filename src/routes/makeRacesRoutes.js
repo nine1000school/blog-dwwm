@@ -73,7 +73,7 @@ const makeRacesRoutes = ({ app }) => {
     async (req, res) => {
       const { seasonId } = req.params
       const race = await Race.query()
-        .where('seasonId',seasonId)
+        .where('seasonId', seasonId)
         .throwIfNotFound()
 
       res.send({ result: race})
@@ -89,7 +89,9 @@ const makeRacesRoutes = ({ app }) => {
     }),
     async (req, res) => {
       const { circuitId } = req.params
-      const race = await Race.query().where('circuitId',circuitId).throwIfNotFound()
+      const race = await Race.query()
+        .where('circuitId', circuitId)
+        .throwIfNotFound()
 
       res.send({ result: race })
     }

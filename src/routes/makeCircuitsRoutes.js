@@ -57,7 +57,7 @@ const makeCircuitsRoutes = ({ app }) => {
       const { name } = req.params
       const circuit = await Circuit.query().findOne({ name }).throwIfNotFound()
 
-      res.send({ result: circuit, count:1 })
+      res.send({ result: circuit })
     }
   )
 
@@ -92,7 +92,7 @@ const makeCircuitsRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updatedCircuit, count: 1 })
+      res.send({ result: updatedCircuit })
     }
   )
 
