@@ -59,12 +59,12 @@ const makeRacesRoutes = ({ app }) => {
       const { name } = req.params
       const race = await Race.query().findOne({ name }).throwIfNotFound()
 
-      res.send({ result: race, count:1 })
+      res.send({ result: race})
     }
   )
 
   app.get(
-    "/races/:seasonId",
+    "/races/season/:seasonId",
     validate({
       params: {
         seasonId: validateId.required(),
@@ -72,14 +72,16 @@ const makeRacesRoutes = ({ app }) => {
     }),
     async (req, res) => {
       const { seasonId } = req.params
-      const race = await Race.query().findById(seasonId).throwIfNotFound()
+      const race = await Race.query()
+        .where('seasonId',seasonId)
+        .throwIfNotFound()
 
-      res.send({ result: race, count:1 })
+      res.send({ result: race})
     }
   )
 
   app.get(
-    "/races/:circuitId",
+    "/races/circuit/:circuitId",
     validate({
       params: {
         circuitId: validateId.required(),
@@ -87,9 +89,9 @@ const makeRacesRoutes = ({ app }) => {
     }),
     async (req, res) => {
       const { circuitId } = req.params
-      const race = await Race.query().findById(circuitId).throwIfNotFound()
+      const race = await Race.query().where('circuitId',circuitId).throwIfNotFound()
 
-      res.send({ result: race, count:1 })
+      res.send({ result: race })
     }
   )
 
@@ -126,7 +128,7 @@ const makeRacesRoutes = ({ app }) => {
         })
         .returning("*")
       
-      res.send({ result: updateRace, count: 1 })
+      res.send({ result: updateRace })
     }
   )
 

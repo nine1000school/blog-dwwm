@@ -16,7 +16,13 @@ const makeSessionRoutes = ({ app }) => {
       const { emailOrUsername, password } = req.body
 
       if (!emailOrUsername) {
-        res.status(401).send({ error: ["Invalid credentials."] })
+        res.status(401).send({ error: ["Enter your Email or Username"] })
+
+        return
+      }
+      
+      if (!password) {
+        res.status(401).send({ error: ["Enter your password"] })
 
         return
       }
