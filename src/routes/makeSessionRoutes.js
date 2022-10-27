@@ -3,7 +3,7 @@ import config from "../config.js"
 import User from "../db/models/User.js"
 import validate from "../middlewares/validate.js"
 import { send401 } from "../utils/http.js"
-import { validateEmailOrUsername, validatePassword } from "../validators.js"
+import { validateEmail, validateEmailOrUsername, validatePassword, validateUsername } from "../validators.js"
 
 const makeSessionRoutes = ({ app }) => {
   app.post(
@@ -63,6 +63,55 @@ const makeSessionRoutes = ({ app }) => {
       )
 
       res.send({ result: [{ jwt }], count: 1 })
+    }
+  )
+  
+  app.patch(
+    "/reset-password",
+    validate({
+      body: {
+        password: validatePassword.required(),
+      }
+    }),
+    async (req, res) => {
+      const { password } = req.body
+      const resetPassword = await User
+        .$query()
+        .patch({ password })
+        .returning("*")
+      
+      res.send({ result: resetPassword })
+    }
+  )
+
+  app.get(
+    "/forgot-password",
+    validate({
+      body: {
+        email: validateEmail.required(),
+      }
+    }),
+    async (req, res) => {
+      const { email } = req.body
+
+      if (!email) {
+        res.status(401).send({ error: ["Enter your Email"] })
+
+        return
+      }
+
+      const user = await User.query()
+        .findOne({
+          email: email,
+        })
+
+      if (!user) {
+        send401(res)
+
+        return
+      }
+
+      res.send({user})
     }
   )
 }
