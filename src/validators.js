@@ -66,3 +66,4 @@ export const validateCommentContent = validateContent.label("Comment content")
 export const validateNumberOfTurn = yup.number().min(1).label("numberOfTurn")
 
 export const validateDate = yup.date().label("Date")
+export const validateName = yup.string().min(1).max(50).label("Name")

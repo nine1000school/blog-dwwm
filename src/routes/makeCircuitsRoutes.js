@@ -13,7 +13,7 @@ const makeCircuitsRoutes = ({ app, db }) => {
   // CREATE
   app.post(
     "/circuits",
-    auth,
+    /*auth,*/
     validate({
       body: {
         name: validateUsername.required(),
@@ -67,15 +67,15 @@ const makeCircuitsRoutes = ({ app, db }) => {
       },
     }),
     async (req, res) => {
-      const { limit, offset } = req.query
+      // const { limit, offset } = req.query
 
-      const circuits = await db("circuits").limit(limit).offset(offset)
+      const circuits = await db("circuits")
 
       if (!circuits) {
         res.send("not circuits")
       }
 
-      const count = await db("circuits").count()
+      const [{ count }] = await db("circuits").count()
       res.send({ result: circuits, count })
     }
   )
@@ -184,6 +184,12 @@ const makeCircuitsRoutes = ({ app, db }) => {
       res.send({ result: [circuit], count })
     }
   )
+  app.delete("/circuits", async (req, res) => {
+    const [circuits] = await db("circuits").del().returning("*")
+    const count = await db("circuits").count()
+
+    res.send({ result: [circuits], count })
+  })
 }
 
 export default makeCircuitsRoutes

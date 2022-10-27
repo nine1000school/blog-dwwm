@@ -1,3 +1,4 @@
+import User from "../db/model/User.js"
 import filterDBResult from "../filterDBResult.js"
 import hashPassword from "../hashPassword.js"
 import validate from "../middlewares/validate.js"
@@ -28,7 +29,7 @@ const makeUsersRoutes = ({ app, db }) => {
       const [passwordHash, passwordSalt] = hashPassword(password)
 
       try {
-        const [user] = await db("users")
+        const user = await User.query()
           .insert({
             email,
             username,
@@ -37,8 +38,9 @@ const makeUsersRoutes = ({ app, db }) => {
             passwordSalt,
           })
           .returning("*")
+        const [{ count }] = await User.query().count()
 
-        res.send({ result: filterDBResult([user]), count: 1 }) // filter sensitive data
+        res.send({ result: filterDBResult([user]), count }) // filter sensitive data
       } catch (err) {
         if (err.code === "23505") {
           res.status(409).send({
@@ -68,8 +70,8 @@ const makeUsersRoutes = ({ app, db }) => {
     }),
     async (req, res) => {
       const { limit, offset } = req.query
-      const users = await db("users").limit(limit).offset(offset)
-      const [{ count }] = await db("users").count()
+      const users = await User.query().limit(limit).offset(offset)
+      const [{ count }] = await User.query().count()
 
       res.send({ result: filterDBResult(users), count })
     }
@@ -77,45 +79,73 @@ const makeUsersRoutes = ({ app, db }) => {
   // READ single
   app.get(
     "/users/:userId",
-    validate({
-      params: {
-        userId: validateId.required(),
-      },
-    }),
+    // validate({
+    //   params: {
+    //     userId: validateId.required(),
+    //   },
+    // }),
     async (req, res) => {
       const { userId } = req.params
-      const [user] = await db("users").where({ id: userId })
 
-      if (!user) {
-        res.status(404).send({ error: ["User not found."] })
+      if (typeof userId == "number") {
+        const user = await User.query().findById(userId)
+        const [{ count }] = await User.query().count()
+
+        if (!user) {
+          res.status(404).send({ error: ["User not found."] })
+
+          return
+        }
+
+        res.send({ result: filterDBResult([user]), count })
 
         return
       }
 
-      res.send({ result: filterDBResult([user]), count: 1 })
+      try {
+        const [user] = await db("users")
+          .where({ email: userId })
+          .select("id", "email", "username", "displayName")
+
+        if (!user) {
+          res.status(404).send({ error: ["email invalide !"] })
+
+          return
+        }
+
+        console.log(user)
+
+        res.send({ result: [user] })
+      } catch (err) {
+        // console.log(err)
+        res.send({ result: err })
+      }
     }
   )
+
   // UPDATE partial
   app.patch(
     "/users/:userId",
-    validate({
-      params: {
-        userId: validateId.required(),
-      },
-      body: {
-        email: validateEmail,
-        username: validateUsername,
-        displayName: validateDisplayName,
-        password: validatePassword,
-      },
-    }),
+    // validate({
+    //   params: {
+    //     userId: validateId.required(),
+    //   },
+    // ,
+    // body: {
+    //   email: validateEmail,
+    //   username: validateUsername,
+    //   displayName: validateDisplayName,
+    //   password: validatePassword,
+    // },
+    // }),
     async (req, res) => {
       const {
         params: { userId },
-        body: { email, username, password, displayName },
+        body: { password },
       } = req
 
-      const [user] = await db("users").where({ id: userId })
+      const [user] = await await db("users").where({ email: userId })
+      // User.query().findById(userId)
 
       if (!user) {
         res.status(404).send({ error: ["User not found."] })
@@ -134,19 +164,17 @@ const makeUsersRoutes = ({ app, db }) => {
       }
 
       try {
-        const [updatedUser] = await db("users")
-          .where({ id: userId })
+        const [updatedUser] = await await db("users")
+          .where({ email: userId })
+          // User.query().findById(userId)
           .update({
-            email,
-            username,
-            displayName,
             passwordHash,
             passwordSalt,
             updatedAt: new Date(),
           })
           .returning("*")
 
-        res.send({ result: updatedUser, count: 1 })
+        res.send({ result: [updatedUser] })
       } catch (err) {
         if (err.code === "23505") {
           res.status(409).send({

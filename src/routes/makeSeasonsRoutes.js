@@ -5,6 +5,7 @@ import {
   validateDate,
   validateId,
   validateLimit,
+  validateName,
   validateOffset,
   validateUsername,
 } from "../validators.js"
@@ -13,10 +14,10 @@ const makeSeasonsRoutes = ({ app, db }) => {
   // CREATE
   app.post(
     "/seasons",
-    auth,
+    // auth,
     validate({
       body: {
-        name: validateUsername.required(),
+        name: validateName.required(),
         year: validateDate.required(),
       },
     }),
@@ -62,19 +63,13 @@ const makeSeasonsRoutes = ({ app, db }) => {
       query: {
         limit: validateLimit,
         offset: validateOffset,
-        userId: validateId,
       },
     }),
     async (req, res) => {
-      const { limit, offset } = req.query
+      // const { limit, offset } = req.query
+      const seasons = await db("seasons")
+      const [{ count }] = await db("seasons").count()
 
-      const seasons = await db("seasons").limit(limit).offset(offset)
-
-      if (!seasons) {
-        res.send("not seasons")
-      }
-
-      const count = await db("seasons").count()
       res.send({ result: seasons, count })
     }
   )
@@ -100,7 +95,7 @@ const makeSeasonsRoutes = ({ app, db }) => {
 
       const count = await db("seasons").count()
 
-      res.send({ result: [season], count })
+      res.send({ result: season, count })
     }
   )
 
@@ -177,6 +172,16 @@ const makeSeasonsRoutes = ({ app, db }) => {
       const count = await db("seasons").count()
 
       res.send({ result: [season], count })
+    }
+  )
+
+  app.delete(
+    "/seasons",
+
+    async (req, res) => {
+      const seasons = await db("seasons").del().returning("*")
+
+      res.send({ result: [seasons] })
     }
   )
 }
