@@ -8,6 +8,7 @@ import makeCommentsRoutes from "./routes/makeCommentsRoutes.js"
 import makePostsRoutes from "./routes/makePostsRoutes.js"
 import makeRacesRoutes from "./routes/makeRacesRoutes.js"
 import makeSeasonsRoutes from "./routes/makeSeasonsRoutes.js"
+import makeSendRoutes from "./routes/makeSendRoute.js"
 import makeSessionRoutes from "./routes/makeSessionRoutes.js"
 import makeUsersRoutes from "./routes/makeUsersRoutes.js"
 
@@ -26,6 +27,7 @@ makeCommentsRoutes({ app, db })
 makeCircuitsRoutes({ app, db })
 makeSeasonsRoutes({ app, db })
 makeRacesRoutes({ app, db })
+makeSendRoutes({ app, db })
 
 app.listen(config.server.port, () =>
   // eslint-disable-next-line no-console

@@ -102,24 +102,21 @@ const makeUsersRoutes = ({ app, db }) => {
         return
       }
 
-      try {
-        const [user] = await db("users")
-          .where({ email: userId })
-          .select("id", "email", "username", "displayName")
+      // get par email
 
-        if (!user) {
-          res.status(404).send({ error: ["email invalide !"] })
+      const [user] = await db("users")
+        .where({ email: userId })
+        .select("id", "email", "username", "displayName")
 
-          return
-        }
+      if (!user) {
+        res.status(200).send("Ok")
 
-        console.log(user)
-
-        res.send({ result: [user] })
-      } catch (err) {
-        // console.log(err)
-        res.send({ result: err })
+        return
       }
+
+      console.log(user)
+
+      res.send({ result: user })
     }
   )
 
@@ -144,7 +141,7 @@ const makeUsersRoutes = ({ app, db }) => {
         body: { password },
       } = req
 
-      const [user] = await await db("users").where({ email: userId })
+      const [user] = await db("users").where({ email: userId })
       // User.query().findById(userId)
 
       if (!user) {
