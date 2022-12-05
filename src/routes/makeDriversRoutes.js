@@ -1,3 +1,4 @@
+
 import Driver from "../db/models/Driver.js"
 import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
@@ -111,8 +112,11 @@ const makeDriversRoutes = ({ app }) => {
       const driver = await Driver.query().deleteById(driverId).throwIfNotFound()
 
       res.send({ result: driver })
+
     }
   )
 }
 
+
 export default makeDriversRoutes
+

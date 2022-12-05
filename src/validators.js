@@ -79,5 +79,3 @@ export const validateEventPenalty = yup.string().min(4).label("Event's penalty")
 export const validateEventAbord = yup.string().min(4).label("Event's abord")
 export const validateEventCrash = yup.string().min(4).label("Event's crash")
 export const validateEventPuncture = yup.string().min(4).label("Event's puncture")
-
-

@@ -1,3 +1,4 @@
+
 import Team from "../db/models/Team.js"
 import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
@@ -15,7 +16,6 @@ const makeTeamsRoutes = ({ app }) => {
     }),
     async (req, res) => {
       const { name, nationnality } = req.body
-
       const team = await Team.query()
         .insert({
           name,
