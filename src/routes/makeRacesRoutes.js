@@ -133,6 +133,31 @@ const makeRacesRoutes = ({ app, db }) => {
       res.send({ result: races })
     }
   )
+
+  //************
+  app.get(
+    "/races/name/:name",
+    // validate({
+    //   params: {
+    //     seasonId1: validateId.required(),
+    //   },
+    // }),
+    async (req, res) => {
+      console.log(456)
+      const { name } = req.params
+      console.log(name)
+
+      const race = await db("races").where({ name: name })
+
+      if (!race) {
+        res.status(404).send({ error: "races not found." })
+
+        return
+      }
+
+      res.send({ result: race })
+    }
+  )
   // UPDATE partial
   app.patch(
     "/races/:raceId",

@@ -13,7 +13,6 @@ import {
 } from "../validators.js"
 
 const makeUsersRoutes = ({ app, db }) => {
-  // CREATE
   app.post(
     "/users",
     validate({
@@ -69,8 +68,9 @@ const makeUsersRoutes = ({ app, db }) => {
       },
     }),
     async (req, res) => {
-      const { limit, offset } = req.query
-      const users = await User.query().limit(limit).offset(offset)
+      // const { limit, offset } = req.query
+      const users = await User.query()
+      // .limit(limit).offset(offset)
       const [{ count }] = await User.query().count()
 
       res.send({ result: filterDBResult(users), count })
@@ -121,6 +121,191 @@ const makeUsersRoutes = ({ app, db }) => {
   )
 
   // UPDATE partial
+  app.patch(
+    "/users/:userId",
+    validate({
+      params: {
+        userId: validateId.required(),
+      },
+      body: {
+        email: validateEmail,
+        username: validateUsername,
+        displayName: validateDisplayName,
+        password: validatePassword,
+      },
+    }),
+    async (req, res) => {
+      const {
+        params: { userId },
+        body: { email1, username1, displayName1, password1 },
+      } = req
+
+      const object = [email1, username1, displayName1, password1].map(
+        (item) => {
+          if (item === "") {
+            return undefined
+          }
+
+          return item
+        }
+      )
+      const email = object[0]
+      const username = object[1]
+      const displayName = object[2]
+      const password = object[3]
+
+      const [user] = await db("users").where({ id: userId })
+
+      if (!user) {
+        res.status(404).send({ error: ["User not found."] })
+
+        return
+      }
+
+      let passwordHash
+      let passwordSalt
+
+      if (password) {
+        const [hash, salt] = hashPassword(password)
+
+        passwordHash = hash
+        passwordSalt = salt
+      }
+
+      try {
+        const [updatedUser] = await await db("users")
+          .where({ id: userId })
+          // User.query().findById(userId)
+          .update({
+            email,
+            username,
+            displayName,
+            passwordHash,
+            passwordSalt,
+            updatedAt: new Date(),
+          })
+          .returning("*")
+
+        res.send({ result: [updatedUser] })
+      } catch (err) {
+        if (err.code === "23505") {
+          res.status(409).send({
+            error: [
+              `Duplicated value for "${err.detail.match(/^Key \((\w+)\)/)[1]}"`,
+            ],
+          })
+
+          return
+        }
+
+        // eslint-disable-next-line no-console
+        console.error(err)
+
+        res.status(500).send({ error: "Oops. Something went wrong." })
+      }
+    }
+  )
+
+  // UPDATE password
+  app.patch(
+    "/users/password/:userId",
+    // validate({
+    //   params: {
+    //     userId: validateId.required(),
+    //   },
+    // ,
+    // body: {
+    //   email: validateEmail,
+    //   username: validateUsername,
+    //   displayName: validateDisplayName,
+    //   password: validatePassword,
+    // },
+    // }),
+    async (req, res) => {
+      const {
+        params: { userId },
+        body: { password },
+      } = req
+
+      const [user] = await db("users").where({ email: userId })
+      // User.query().findById(userId)
+
+      if (!user) {
+        res.status(404).send({ error: ["User not found."] })
+
+        return
+      }
+
+      let passwordHash
+      let passwordSalt
+
+      if (password) {
+        const [hash, salt] = hashPassword(password)
+
+        passwordHash = hash
+        passwordSalt = salt
+      }
+
+      try {
+        const [updatedUser] = await await db("users")
+          .where({ email: userId })
+          // User.query().findById(userId)
+          .update({
+            passwordHash,
+            passwordSalt,
+            updatedAt: new Date(),
+          })
+          .returning("*")
+
+        res.send({ result: [updatedUser] })
+      } catch (err) {
+        if (err.code === "23505") {
+          res.status(409).send({
+            error: [
+              `Duplicated value for "${err.detail.match(/^Key \((\w+)\)/)[1]}"`,
+            ],
+          })
+
+          return
+        }
+
+        // eslint-disable-next-line no-console
+        console.error(err)
+
+        res.status(500).send({ error: "Oops. Something went wrong." })
+      }
+    }
+  )
+
+  // DELETE
+  app.delete(
+    "/users/:userId",
+    validate({
+      params: {
+        userId: validateId.required(),
+      },
+    }),
+    async (req, res) => {
+      const { userId } = req.params
+      const [user] = await db("users").where({ id: userId })
+
+      if (!user) {
+        res.status(404).send({ error: ["User not found."] })
+
+        return
+      }
+
+      await db("users").delete().where({ id: userId })
+
+      res.send({ result: filterDBResult([user]), count: 1 })
+    }
+  )
+}
+
+export default makeUsersRoutes
+
+/*
+// UPDATE partial
   app.patch(
     "/users/:userId",
     // validate({
@@ -189,30 +374,4 @@ const makeUsersRoutes = ({ app, db }) => {
         res.status(500).send({ error: "Oops. Something went wrong." })
       }
     }
-  )
-  // DELETE
-  app.delete(
-    "/users/:userId",
-    validate({
-      params: {
-        userId: validateId.required(),
-      },
-    }),
-    async (req, res) => {
-      const { userId } = req.params
-      const [user] = await db("users").where({ id: userId })
-
-      if (!user) {
-        res.status(404).send({ error: ["User not found."] })
-
-        return
-      }
-
-      await db("users").delete().where({ id: userId })
-
-      res.send({ result: filterDBResult([user]), count: 1 })
-    }
-  )
-}
-
-export default makeUsersRoutes
+  )*/

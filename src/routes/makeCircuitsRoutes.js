@@ -4,6 +4,7 @@ import validate from "../middlewares/validate.js"
 import {
   validateId,
   validateLimit,
+  validateName,
   validateNumberOfTurn,
   validateOffset,
   validateUsername,
@@ -16,8 +17,8 @@ const makeCircuitsRoutes = ({ app, db }) => {
     /*auth,*/
     validate({
       body: {
-        name: validateUsername.required(),
-        location: validateUsername.required(),
+        name: validateName.required(),
+        location: validateName.required(),
         length: validateNumberOfTurn.required(),
         numberOfTurn: validateNumberOfTurn.required(),
       },
@@ -108,23 +109,35 @@ const makeCircuitsRoutes = ({ app, db }) => {
   // UPDATE partial
   app.patch(
     "/circuits/:circuitId",
-    auth,
+    // auth,
     validate({
       params: {
         circuitId: validateId.required(),
       },
-      body: {
-        name: validateUsername,
-        location: validateUsername,
-        length: validateNumberOfTurn,
-        numberOfTurn: validateNumberOfTurn,
-      },
+      // body: {
+      //   name: validateName,
+      //   location: validateName,
+      //   length: validateNumberOfTurn,
+      //   numberOfTurn: validateNumberOfTurn,
+      // },
     }),
     async (req, res) => {
       const {
         params: { circuitId },
-        body: { name, location, length, numberOfTurn },
+        body: { name1, location1, length1, numberOfTurn1 },
       } = req
+      console.log({ result: { name1, location1, length1, numberOfTurn1 } })
+      const object = [name1, location1, length1, numberOfTurn1].map((item) => {
+        if (item === "") {
+          return undefined
+        }
+
+        return item
+      })
+
+      console.log(object)
+      // const objetcts = Object.fromEntries(objet.filter((item) => item !== ""))
+      // const value = object.filter((items) => items !== "")
 
       const [circuit] = await db("circuits").where({ id: circuitId })
 
@@ -133,6 +146,11 @@ const makeCircuitsRoutes = ({ app, db }) => {
 
         return
       }
+
+      const name = name1
+      const location = location1
+      const length = length1
+      const numberOfTurn = numberOfTurn1
 
       try {
         const [updatedCircuit] = await db("circuits")

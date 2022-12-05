@@ -23,13 +23,31 @@ const makeSendRoutes = ({ app, db }) => {
           to: `${email}`,
           subject: `test`,
           html: `<div>
-          <img
-            className="w-64 h-32"
-            src="https://www.pngmart.com/files/10/Formula-1-Logo-PNG-File.png"
-            alt="logo f1"
-          />
-          
-          pour rienetialiser le mot de passe clic <a href="http://localhost:3000/users/user-patch"> ICI</a></div>`,
+            pour rienetialiser le mot de passe clic <a href="http://localhost:3000/users/user-patch"> ICI</a></div>`,
+        },
+        (error, body) => {
+          if (error) {
+            console.log(error)
+            res.status(500).send({ message: "Error in sending email" })
+          } else {
+            console.log(body)
+            res.send({ message: "Email sent successfully" })
+          }
+        }
+      )
+  })
+
+  app.post("/api/message", (req, res) => {
+    const { email, message, object } = req.body
+    console.log({ email, message, object })
+    mailgun()
+      .messages()
+      .send(
+        {
+          from: `${email}`,
+          to: "mslimani1983@gmail.com",
+          subject: `${object}`,
+          html: `from ${email} <br/> ${message}`,
         },
         (error, body) => {
           if (error) {

@@ -12,8 +12,8 @@ import {
 const makeCommentsRoutes = ({ app, db }) => {
   // CREATE
   app.post(
-    "/comments",
-    auth,
+    "/comments/:userId",
+    // auth,
     // validate({
     //   body: {
     //     raceId: validateId.required(),
@@ -23,14 +23,16 @@ const makeCommentsRoutes = ({ app, db }) => {
     async (req, res) => {
       const {
         body: { content, raceId },
-        session: { user },
+        params: { userId },
+        // session: { user },
       } = req
+      console.log(userId)
 
       const [comment] = await db("comments")
         .insert({
           content,
           raceId,
-          userId: user.id,
+          userId: userId,
         })
         .returning("*")
 
@@ -89,15 +91,15 @@ const makeCommentsRoutes = ({ app, db }) => {
     async (req, res) => {
       const { commentId } = req.params
 
-      const [comment] = await db("comments").where({ id: commentId })
+      const comments = await db("comments").where({ userId: commentId })
 
-      if (!comment) {
-        res.status(404).send({ error: "Comment not found." })
+      if (!comments) {
+        res.send("Comment not found.")
 
         return
       }
 
-      res.send({ result: [comment], count: 1 })
+      res.send({ result: comments })
     }
   )
   // UPDATE partial

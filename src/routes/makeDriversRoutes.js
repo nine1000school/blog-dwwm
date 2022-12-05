@@ -1,5 +1,5 @@
 import filterDBResult from "../filterDBResult.js"
-import auth from "../middlewares/auth.js"
+// import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
 import {
   validateId,
@@ -11,39 +11,36 @@ import {
   validateSearch,
 } from "../validators.js"
 
-const makePostsRoutes = ({ app, db }) => {
+const makeDriversRoutes = ({ app, db }) => {
   // CREATE
   app.post(
-    "/posts",
-    auth,
-    validate({
-      body: {
-        title: validatePostTitle.required(),
-        content: validatePostContent.required(),
-        publishedAt: validatePublishedAt,
-      },
-    }),
+    "/drivers",
+    // auth,
+    // validate({
+    //   body: {
+    //     name: validatePostTitle.required(),
+    //     nationnality: validatePostContent.required(),
+    //   },
+    // }),
     async (req, res) => {
       const {
-        body: { title, content, publishedAt },
-        session: { user },
+        body: { name, nationnality, teamId },
       } = req
 
-      const [post] = await db("posts")
+      const [driver] = await db("drivers")
         .insert({
-          title,
-          content,
-          publishedAt,
-          userId: user.id,
+          name,
+          nationnality,
+          teamId,
         })
         .returning("*")
 
-      res.send({ result: filterDBResult([post]), count: 1 })
+      res.send({ result: [driver], count: 1 })
     }
   )
   // READ collection
   app.get(
-    "/posts",
+    "/drivers",
     validate({
       query: {
         limit: validateLimit,
@@ -210,4 +207,4 @@ const makePostsRoutes = ({ app, db }) => {
   )
 }
 
-export default makePostsRoutes
+export default makeDriversRoutes
