@@ -1,160 +1,126 @@
-import filterDBResult from "../filterDBResult.js"
+import Comment from "../db/models/Comment.js"
 import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
-import {
-  validateCommentContent,
-  validateId,
-  validateLimit,
-  validateOffset,
-  validateSearch,
-} from "../validators.js"
+import hasAccess from "../utils/hasAccess.js"
+import { validateContent, validateDate, validateId, validateLimit, validateOffset, validateSeasonName } from "../validators.js"
 
-const makeCommentsRoutes = ({ app, db }) => {
-  // CREATE
+const makeCommentsRoutes = ({ app }) => {
   app.post(
     "/comments",
-    auth,
+    auth(),
     validate({
       body: {
-        postId: validateId.required(),
-        content: validateCommentContent.required(),
-      },
+        content: validateContent.required(),
+        userId: validateId.required(),
+        raceId: validateId.required(),
+      }
     }),
     async (req, res) => {
-      const {
-        body: { content, postId },
-        session: { user },
-      } = req
+      const { content, userId, raceId } = req.body
 
-      const [comment] = await db("comments")
+      const comment = await Comment.query()
         .insert({
           content,
-          postId,
-          userId: user.id,
+          userId,
+          raceId,
         })
         .returning("*")
-
-      res.send({ result: filterDBResult([comment]), count: 1 })
+      
+      res.send({ result: comment })
     }
   )
-  // READ collection
+
   app.get(
     "/comments",
+    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
         offset: validateOffset,
-        userId: validateId,
-        postId: validateId,
-        search: validateSearch,
-      },
+      }
     }),
-    async (req, res) => {
-      const { limit, offset, userId, postId, search } = req.query
-      const commentsQuery = db("comments").limit(limit).offset(offset)
-      const countQuery = db("comments").count()
+    async(req, res) => {
+      const { limit, offset } = req.locals.query
+      const comments = await Comment.query().limit(limit).offset(offset)
+      const [{ count }] = await Comment.query().count()
 
-      if (postId) {
-        commentsQuery.where({ postId })
-        countQuery.where({ postId })
-      }
-
-      if (userId) {
-        commentsQuery.where({ userId })
-        countQuery.where({ userId })
-      }
-
-      if (search) {
-        const searchPattern = `%${search}%`
-        commentsQuery.where((query) =>
-          query.whereILike("content", searchPattern)
-        )
-        countQuery.where((query) => query.whereILike("content", searchPattern))
-      }
-
-      const comments = await commentsQuery
-      const [{ count }] = await countQuery
-
-      res.send({ result: filterDBResult(comments), count })
+      res.send({ result: comments , count})
     }
   )
-  // READ single
+
   app.get(
     "/comments/:commentId",
+    auth(),
     validate({
       params: {
         commentId: validateId.required(),
+      }
+    }),
+    async (req, res) => {
+      const { commentId } = req
+
+
+      const comment = await Comment.query().findById(commentId).throwIfNotFound()
+
+      res.send({ result: comment })
+    }
+  )
+  
+  app.patch(
+    "/comments/:commentId",
+    auth(),
+    validate({
+      params: {
+        commentId: validateId.required()
       },
+      body: {
+        content: validateSeasonName,
+        userId: validateDate,
+        raceId: validateId,
+      }
+    }),
+    async (req, res) => {
+      const {
+        params: { commentId },
+        body: { content, userId, raceId },
+        session
+      } = req
+
+      if (userId !== session.user.id) {
+        hasAccess(req.session, "ADMIN")
+      }
+
+      const comment = await Comment.query().findById(commentId).throwIfNotFound()
+
+      const updatedSeason = await comment
+        .$query()
+        .patch({
+          content,
+          userId,
+          raceId,
+          updateAt: new Date()
+        })
+        .returning("*")
+      
+      res.send({ result: updatedSeason })
+    }
+  )
+
+  app.delete(
+    "/comments/:commentId",
+    auth(),
+    validate({
+      params: {
+        commentId: validateId.required(),
+      }
     }),
     async (req, res) => {
       const { commentId } = req.params
 
-      const [comment] = await db("comments").where({ id: commentId })
 
-      if (!comment) {
-        res.status(404).send({ error: "Comment not found." })
+      const comment = await Comment.query().deleteById(commentId).throwIfNotFound()
 
-        return
-      }
-
-      res.send({ result: [comment], count: 1 })
-    }
-  )
-  // UPDATE partial
-  app.patch(
-    "/comments/:commentId",
-    validate({
-      params: {
-        commentId: validateId.required(),
-      },
-      body: {
-        content: validateCommentContent.required(),
-      },
-    }),
-    async (req, res) => {
-      const {
-        params: { commentId },
-        body: { content },
-      } = req
-
-      const [comment] = await db("comments").where({ id: commentId })
-
-      if (!comment) {
-        res.status(404).send({ error: "Comment not found." })
-
-        return
-      }
-
-      const [updatedComment] = await db("comments")
-        .where({ id: commentId })
-        .update({
-          content,
-          updatedAt: new Date(),
-        })
-
-      res.send({ result: [updatedComment], count: 1 })
-    }
-  )
-  // DELETE
-  app.delete(
-    "/comments/:commentId",
-    validate({ params: { commentId: validateId.required() } }),
-    async (req, res) => {
-      const {
-        params: { commentId },
-      } = req
-
-      const [comment] = await db("comments").where({ id: commentId })
-
-      if (!comment) {
-        res.status(404).send({ error: "Comment not found." })
-
-        return
-      }
-
-      await db("comments").where({ id: commentId }).delete()
-
-      res.send({ result: [comment], count: 1 })
+      res.send({ result: comment })
     }
   )
 }

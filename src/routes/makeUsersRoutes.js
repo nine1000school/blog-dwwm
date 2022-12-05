@@ -1,6 +1,9 @@
+import User from "../db/models/User.js"
 import filterDBResult from "../filterDBResult.js"
 import hashPassword from "../hashPassword.js"
+import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
+import hasAccess from "../utils/hasAccess.js"
 import {
   validateDisplayName,
   validateEmail,
@@ -8,10 +11,11 @@ import {
   validateLimit,
   validateOffset,
   validatePassword,
+  validateRole,
   validateUsername,
 } from "../validators.js"
 
-const makeUsersRoutes = ({ app, db }) => {
+const makeUsersRoutes = ({ app }) => {
   // CREATE
   app.post(
     "/users",
@@ -27,39 +31,23 @@ const makeUsersRoutes = ({ app, db }) => {
       const { email, username, displayName, password } = req.body
       const [passwordHash, passwordSalt] = hashPassword(password)
 
-      try {
-        const [user] = await db("users")
-          .insert({
-            email,
-            username,
-            displayName,
-            passwordHash,
-            passwordSalt,
-          })
-          .returning("*")
+      const user = await User.query()
+        .insert({
+          email,
+          username,
+          displayName,
+          passwordHash,
+          passwordSalt,
+        })
+        .returning("*")
 
-        res.send({ result: filterDBResult([user]), count: 1 }) // filter sensitive data
-      } catch (err) {
-        if (err.code === "23505") {
-          res.status(409).send({
-            error: [
-              `Duplicated value for "${err.detail.match(/^Key \((\w+)\)/)[1]}"`,
-            ],
-          })
-
-          return
-        }
-
-        // eslint-disable-next-line no-console
-        console.error(err)
-
-        res.status(500).send({ error: ["Oops. Something went wrong."] })
-      }
+      res.send({ result: filterDBResult([user]), count: 1 })
     }
   )
   // READ collection
   app.get(
     "/users",
+    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
@@ -67,30 +55,24 @@ const makeUsersRoutes = ({ app, db }) => {
       },
     }),
     async (req, res) => {
-      const { limit, offset } = req.query
-      const users = await db("users").limit(limit).offset(offset)
-      const [{ count }] = await db("users").count()
+      const { limit, offset } = req.locals.query
+      const users = await User.query().limit(limit).offset(offset)
+      const [{ count }] = await User.query().count()
 
       res.send({ result: filterDBResult(users), count })
     }
   )
   // READ single
   app.get(
-    "/users/:userId",
+    "/users/:username",
     validate({
       params: {
-        userId: validateId.required(),
+        username: validateUsername.required(),
       },
     }),
     async (req, res) => {
-      const { userId } = req.params
-      const [user] = await db("users").where({ id: userId })
-
-      if (!user) {
-        res.status(404).send({ error: ["User not found."] })
-
-        return
-      }
+      const { username } = req.params
+      const user = await User.query().findOne({ username }).throwIfNotFound()
 
       res.send({ result: filterDBResult([user]), count: 1 })
     }
@@ -98,6 +80,7 @@ const makeUsersRoutes = ({ app, db }) => {
   // UPDATE partial
   app.patch(
     "/users/:userId",
+    auth(),
     validate({
       params: {
         userId: validateId.required(),
@@ -113,15 +96,14 @@ const makeUsersRoutes = ({ app, db }) => {
       const {
         params: { userId },
         body: { email, username, password, displayName },
+        session,
       } = req
 
-      const [user] = await db("users").where({ id: userId })
-
-      if (!user) {
-        res.status(404).send({ error: ["User not found."] })
-
-        return
+      if (userId !== session.user.id) {
+        hasAccess(req.session, "ADMIN")
       }
+
+      const user = await User.query().findById(userId).throwIfNotFound()
 
       let passwordHash
       let passwordSalt
@@ -133,57 +115,67 @@ const makeUsersRoutes = ({ app, db }) => {
         passwordSalt = salt
       }
 
-      try {
-        const [updatedUser] = await db("users")
-          .where({ id: userId })
-          .update({
-            email,
-            username,
-            displayName,
-            passwordHash,
-            passwordSalt,
-            updatedAt: new Date(),
-          })
-          .returning("*")
+      const updatedUser = await user
+        .$query()
+        .patch({
+          email,
+          username,
+          displayName,
+          passwordHash,
+          passwordSalt,
+          updatedAt: new Date(),
+        })
+        .returning("*")
 
-        res.send({ result: updatedUser, count: 1 })
-      } catch (err) {
-        if (err.code === "23505") {
-          res.status(409).send({
-            error: [
-              `Duplicated value for "${err.detail.match(/^Key \((\w+)\)/)[1]}"`,
-            ],
-          })
+      res.send({ result: filterDBResult([updatedUser]), count: 1 })
+    }
+  )
+  //PATCH ADMIN
+  app.patch(
+    "/users/:userId/role",
+    auth("ADMIN"),
+    validate({
+      params: {
+        userId: validateId.required()
+      },
+      body: {
+        role: validateRole.required(),
+      },
+    }),
+    async (req, res) => {
+      const {
+        params: { userId },
+        body: { role },
+      } = req
 
-          return
-        }
+      const user = await User.query().findById(userId).throwIfNotFound()
 
-        // eslint-disable-next-line no-console
-        console.error(err)
+      const updatedRole = await user
+        .$query()
+        .patch({  
+          role,  
+          updatedAt: new Date(),
+        })
+        .returning("*")
 
-        res.status(500).send({ error: "Oops. Something went wrong." })
-      }
+      res.send({ result: updatedRole, count: 1 })
     }
   )
   // DELETE
   app.delete(
     "/users/:userId",
+    auth("ADMIN"),
     validate({
       params: {
         userId: validateId.required(),
       },
     }),
     async (req, res) => {
+      hasAccess("ADMIN")
+
       const { userId } = req.params
-      const [user] = await db("users").where({ id: userId })
 
-      if (!user) {
-        res.status(404).send({ error: ["User not found."] })
-
-        return
-      }
-
-      await db("users").delete().where({ id: userId })
+      const user = await User.query().deleteById(userId).throwIfNotFound()
 
       res.send({ result: filterDBResult([user]), count: 1 })
     }

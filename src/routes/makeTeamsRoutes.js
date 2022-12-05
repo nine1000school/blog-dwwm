@@ -1,158 +1,112 @@
-import validate from "../middlewares/validate"
-import auth from "../middlewares/auth"
-import {
-  validateId,
-  validateNationnality,
-  validateUsername,
-} from "../validators"
 
-const makeTeamsRoutes = ({ app, db }) => {
-  //CREATE
+import Team from "../db/models/Team.js"
+import auth from "../middlewares/auth.js"
+import validate from "../middlewares/validate.js"
+import { validateId, validateLimit, validateNationnality, validateOffset, validateTeamName } from "../validators.js"
+
+const makeTeamsRoutes = ({ app }) => {
   app.post(
     "/teams",
-    auth,
+    auth("ADMIN"),
     validate({
       body: {
-        name: validateUsername.required(),
+        name: validateTeamName.required(),
         nationnality: validateNationnality.required(),
-      },
+      }
     }),
     async (req, res) => {
       const { name, nationnality } = req.body
-
-      try {
-        const teams = await db("teams")
-          .insert({ name, nationnality })
-          .returning("*")
-        const count = await db("teams").count()
-
-        res.send({ result: teams, count })
-      } catch (err) {
-        if (err.code === "23505") {
-          res.send({
-            error: [
-              `Duplicated value for "${err.detail.match(/^Key \((\w+)\)/)[1]}"`,
-            ],
-          })
-
-          return
-        }
-
-        console.log(err)
-        res.send("Oops something went wrong")
-      }
+      const team = await Team.query()
+        .insert({
+          name,
+          nationnality,
+        })
+        .returning("*")
+      
+      res.send({ result: team })
     }
   )
 
-  //READ collection
-  app.get("/teams", async (req, res) => {
-    const teams = await db("teams")
-
-    if (!teams) {
-      res.send("Teams not found")
-
-      return
-    }
-
-    const count = await db("teams").count()
-
-    res.send({ result: teams, count })
-  })
-
-  //READ single
   app.get(
-    "/teams/:teamId",
+    "/teams",
+    auth("ADMIN"),
     validate({
-      params: { teamId: validateId },
+      query: {
+        limit: validateLimit,
+        offset: validateOffset,
+      }
+    }),
+    async(req, res) => {
+      const { limit, offset } = req.locals.query
+      const teams = await Team.query().limit(limit).offset(offset)
+      const [{ count }] = await Team.query().count()
+
+      res.send({ result: teams , count})
+    }
+  )
+
+  app.get(
+    "/teams/:name",
+    auth("ADMIN"),
+    validate({
+      params: {
+        name: validateTeamName.required(),
+      }
     }),
     async (req, res) => {
-      const teamId = req.params
-      const [team] = await db("teams").where({
-        id: teamId,
-      })
+      const { name } = req.params
+      const team = await Team.query().findOne({ name }).throwIfNotFound()
 
-      if (!team) {
-        res.send("Error: team doesn't exist")
-
-        return
-      }
-
-      const count = await db("teams").count()
-
-      res.send({ result: team, count })
+      res.send({ result: team })
     }
   )
-
-  //UPDATE
 
   app.patch(
     "/teams/:teamId",
-    auth,
+    auth("ADMIN"),
     validate({
       params: {
-        teamId: validateId,
+        teamId: validateId.required()
       },
       body: {
-        name: validateUsername,
+        name: validateTeamName,
         nationnality: validateNationnality,
-      },
+      }
     }),
     async (req, res) => {
-      const teamId = req.params
-      const { name, nationnality } = req.body
-      const team = await db("teams").where({ id: teamId })
+      const {
+        params: { teamId },
+        body: { name, nationnality },
+      } = req
 
-      if (!team) {
-        res.send("error: Team not found")
+      const team = await Team.query().findById(teamId).throwIfNotFound()
 
-        return
-      }
-
-      try {
-        const teams = await db("teams")
-          .where({ id: teamId })
-          .update({ name, nationnality })
-          .returning("*")
-
-        const count = await db("teams").count()
-
-        res.send({ result: teams, count })
-      } catch (err) {
-        if (err.code === "23505") {
-          res.send({
-            error: [
-              `Duplicated value for "${err.detail.match(/^Key \((\w+)\)/)[1]}"`,
-            ],
-          })
-
-          return
-        }
-
-        console.log(err)
-        res.send("Oops something went wrong")
-      }
+      const updatedTeam = await team
+        .$query()
+        .patch({
+          name,
+          nationnality,
+        })
+        .returning("*")
+      
+      res.send({ result: updatedTeam })
     }
   )
 
-  //DELETE
   app.delete(
     "/teams/:teamId",
+    auth("ADMIN"),
     validate({
-      params: { teamId: validateId },
+      params: {
+        teamId: validateId.required(),
+      }
     }),
     async (req, res) => {
-      const teamId = req.params
-      const team = await db("teams").where({ id: teamId }).del()
+      const { teamId } = req.params
 
-      if (!team) {
-        res.send("Error: team doesn't exist")
+      const team = await Team.query().deleteById(teamId).throwIfNotFound()
 
-        return
-      }
-
-      const count = await db("teams").count()
-
-      res.send({ result: team, count })
+      res.send({ result: team })
     }
   )
 }

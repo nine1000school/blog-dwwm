@@ -1,0 +1,152 @@
+export const ACL = {
+  ADMIN: {
+    users: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+    comments: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+    races: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+    circuits: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+    seasons: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+    events: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+    drivers: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+    teams: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+  },
+  READER: {
+    users: {
+      create: true,
+      read: false,
+      update: false,
+      delete: false,
+    },
+    comments: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    races: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    circuits: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    seasons: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    events: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    drivers: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    teams: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+  },
+  USER: {
+    users: {
+      create: false,
+      read: true,
+      update: true,
+      delete: false,
+    },
+    comments: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
+    races: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    circuits: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    seasons: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    events: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    drivers: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+    teams: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+    },
+  },
+}

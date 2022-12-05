@@ -1,7 +1,9 @@
 import jsonwebtoken from "jsonwebtoken"
 import config from "../config.js"
+import hasAccess from "../utils/hasAccess.js"
+import { send403 } from "../utils/http.js"
 
-const auth = (req, res, next) => {
+const auth = (role) => (req, res, next) => {
   const {
     headers: { authorization = "" },
   } = req
@@ -13,15 +15,19 @@ const auth = (req, res, next) => {
 
     req.session = payload.session
 
+    if (role) {
+      hasAccess(req.session, role)
+    }
+
     next()
   } catch (err) {
     if (err instanceof jsonwebtoken.JsonWebTokenError) {
-      res.status(403).send({ error: ["Forbidden."] })
+      send403(res)
 
       return
     }
 
-    res.status(500).send({ error: ["Oops. Something went wrong."] })
+    throw err
   }
 }
 
