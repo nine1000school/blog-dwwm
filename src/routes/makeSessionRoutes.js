@@ -3,7 +3,7 @@ import config from "../config.js"
 import User from "../db/models/User.js"
 import validate from "../middlewares/validate.js"
 import { send401 } from "../utils/http.js"
-import { validateEmail, validateEmailOrUsername, validatePassword, validateUsername } from "../validators.js"
+import { validateEmail, validateEmailOrUsername, validatePassword } from "../validators.js"
 
 const makeSessionRoutes = ({ app }) => {
   app.post(
