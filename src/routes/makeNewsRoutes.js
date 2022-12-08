@@ -37,7 +37,23 @@ const makeNewsRoutes = ({ app }) => {
       const gottenNews = await News.query()
         .limit(limit)
         .offset(offset)
+        .withGraphFetched({ team: true })
         .orderBy("createdAt", "desc")
+
+      res.send({ result: gottenNews })
+    }
+  )
+  app.get(
+    "/news/:id",
+    validate({ params: { id: validateId.required() } }),
+    async (req, res) => {
+      const { id } = req.params
+
+      const gottenNews = await News.query()
+        .findById(id)
+        .throwIfNotFound()
+        .withGraphFetched({ team: true })
+        .returning("*")
 
       res.send({ result: gottenNews })
     }

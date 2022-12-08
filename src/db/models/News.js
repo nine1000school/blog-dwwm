@@ -11,7 +11,7 @@ class News extends Model {
         modelClass: Team,
         join: {
           from: "news.teamId",
-          to: "team.id",
+          to: "teams.id",
         },
       },
     }
