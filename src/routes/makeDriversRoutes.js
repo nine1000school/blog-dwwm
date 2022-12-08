@@ -1,8 +1,13 @@
-
 import Driver from "../db/models/Driver.js"
 import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
-import { validateId, validateLimit, validateNationnality, validateOffset, validateDriverName } from "../validators.js"
+import {
+  validateId,
+  validateLimit,
+  validateNationnality,
+  validateOffset,
+  validateDriverName,
+} from "../validators.js"
 
 const makeDriversRoutes = ({ app }) => {
   app.post(
@@ -13,7 +18,7 @@ const makeDriversRoutes = ({ app }) => {
         name: validateDriverName.required(),
         nationnality: validateNationnality.required(),
         teamId: validateId.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { name, nationnality, teamId } = req.body
@@ -25,36 +30,34 @@ const makeDriversRoutes = ({ app }) => {
           teamId,
         })
         .returning("*")
-      
+
       res.send({ result: driver })
     }
   )
 
   app.get(
     "/drivers",
-    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
         offset: validateOffset,
-      }
+      },
     }),
-    async(req, res) => {
+    async (req, res) => {
       const { limit, offset } = req.locals.query
       const drivers = await Driver.query().limit(limit).offset(offset)
       const [{ count }] = await Driver.query().count()
 
-      res.send({ result: drivers , count})
+      res.send({ result: drivers, count })
     }
   )
 
   app.get(
     "/drivers/:name",
-    auth("ADMIN"),
     validate({
       params: {
         name: validateDriverName.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { name } = req.params
@@ -69,13 +72,13 @@ const makeDriversRoutes = ({ app }) => {
     auth("ADMIN"),
     validate({
       params: {
-        driverId: validateId.required()
+        driverId: validateId.required(),
       },
       body: {
         name: validateDriverName,
         nationnality: validateNationnality,
         teamId: validateId,
-      }
+      },
     }),
     async (req, res) => {
       const {
@@ -93,7 +96,7 @@ const makeDriversRoutes = ({ app }) => {
           teamId,
         })
         .returning("*")
-      
+
       res.send({ result: updatedDriver })
     }
   )
@@ -104,7 +107,7 @@ const makeDriversRoutes = ({ app }) => {
     validate({
       params: {
         driverId: validateId.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { driverId } = req.params
@@ -112,11 +115,8 @@ const makeDriversRoutes = ({ app }) => {
       const driver = await Driver.query().deleteById(driverId).throwIfNotFound()
 
       res.send({ result: driver })
-
     }
   )
 }
 
-
 export default makeDriversRoutes
-

@@ -8,6 +8,7 @@ import makeCircuitsRoutes from "./routes/makeCircuitsRoutes.js"
 import makeCommentsRoutes from "./routes/makeCommentsRoutes.js"
 import makeDriversRoutes from "./routes/makeDriversRoutes.js"
 import makeEventsRoutes from "./routes/makeEventsRoutes.js"
+import makeNewsRoutes from "./routes/makeNewsRoutes.js"
 import makeRacesRoutes from "./routes/makeRacesRoutes.js"
 import makeSeasonRoutes from "./routes/makeSeasonsRoutes.js"
 import makeSessionRoutes from "./routes/makeSessionRoutes.js"
@@ -43,7 +44,7 @@ makeSeasonRoutes({ app, db })
 makeDriversRoutes({ app, db })
 makeCircuitsRoutes({ app, db })
 makeEventsRoutes({ app, db })
-
+makeNewsRoutes({ app })
 
 app.use(handleErrrors)
 

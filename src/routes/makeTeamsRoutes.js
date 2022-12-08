@@ -1,57 +1,65 @@
-
 import Team from "../db/models/Team.js"
 import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
-import { validateId, validateLimit, validateNationnality, validateOffset, validateTeamName } from "../validators.js"
+import {
+  validateId,
+  validateLimit,
+  validateNationnality,
+  validateOffset,
+  validateTeamName,
+} from "../validators.js"
 
 const makeTeamsRoutes = ({ app }) => {
   app.post(
     "/teams",
-    auth("ADMIN"),
+    // auth("ADMIN"),
     validate({
       body: {
         name: validateTeamName.required(),
-        nationnality: validateNationnality.required(),
-      }
+        points: validateId.required(),
+        requestName: validateTeamName.required(),
+      },
     }),
     async (req, res) => {
-      const { name, nationnality } = req.body
+      const { name, points, requestName } = req.body
       const team = await Team.query()
         .insert({
           name,
-          nationnality,
+          points,
+          requestName,
         })
         .returning("*")
-      
+
       res.send({ result: team })
     }
   )
 
   app.get(
     "/teams",
-    auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
         offset: validateOffset,
-      }
+      },
     }),
-    async(req, res) => {
+    async (req, res) => {
       const { limit, offset } = req.locals.query
-      const teams = await Team.query().limit(limit).offset(offset)
+      const teams = await Team.query()
+        .limit(limit)
+        .offset(offset)
+        .orderBy("points", "desc")
       const [{ count }] = await Team.query().count()
 
-      res.send({ result: teams , count})
+      res.send({ result: teams, count })
     }
   )
 
   app.get(
     "/teams/:name",
-    auth("ADMIN"),
     validate({
       params: {
         name: validateTeamName.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { name } = req.params
@@ -63,20 +71,22 @@ const makeTeamsRoutes = ({ app }) => {
 
   app.patch(
     "/teams/:teamId",
-    auth("ADMIN"),
+    // auth("ADMIN"),
     validate({
       params: {
-        teamId: validateId.required()
+        teamId: validateId.required(),
       },
       body: {
         name: validateTeamName,
         nationnality: validateNationnality,
-      }
+        points: validateId,
+        requestName: validateTeamName,
+      },
     }),
     async (req, res) => {
       const {
         params: { teamId },
-        body: { name, nationnality },
+        body: { name, points, requestName },
       } = req
 
       const team = await Team.query().findById(teamId).throwIfNotFound()
@@ -85,10 +95,11 @@ const makeTeamsRoutes = ({ app }) => {
         .$query()
         .patch({
           name,
-          nationnality,
+          points,
+          requestName,
         })
         .returning("*")
-      
+
       res.send({ result: updatedTeam })
     }
   )
@@ -99,7 +110,7 @@ const makeTeamsRoutes = ({ app }) => {
     validate({
       params: {
         teamId: validateId.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { teamId } = req.params

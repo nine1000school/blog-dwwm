@@ -1,7 +1,15 @@
 import Race from "../db/models/Race.js"
 import auth from "../middlewares/auth.js"
 import validate from "../middlewares/validate.js"
-import { validateId, validateLimit, validateOffset, validateDriverName, validateRaceName, validateLocation, validateDate } from "../validators.js"
+import {
+  validateId,
+  validateLimit,
+  validateOffset,
+  validateDriverName,
+  validateRaceName,
+  validateLocation,
+  validateDate,
+} from "../validators.js"
 
 const makeRacesRoutes = ({ app }) => {
   app.post(
@@ -13,7 +21,7 @@ const makeRacesRoutes = ({ app }) => {
         location: validateLocation.required(),
         raceDate: validateDate.required(),
         seasonId: validateId.required(),
-        circuitId: validateId.required()
+        circuitId: validateId.required(),
       },
     }),
     async (req, res) => {
@@ -25,10 +33,10 @@ const makeRacesRoutes = ({ app }) => {
           location,
           raceDate,
           seasonId,
-          circuitId
+          circuitId,
         })
         .returning("*")
-      
+
       res.send({ result: race })
     }
   )
@@ -40,14 +48,14 @@ const makeRacesRoutes = ({ app }) => {
       query: {
         limit: validateLimit,
         offset: validateOffset,
-      }
+      },
     }),
-    async(req, res) => {
+    async (req, res) => {
       const { limit, offset } = req.locals.query
       const races = await Race.query().limit(limit).offset(offset)
       const [{ count }] = await Race.query().count()
 
-      res.send({ result: races , count})
+      res.send({ result: races, count })
     }
   )
 
@@ -57,13 +65,13 @@ const makeRacesRoutes = ({ app }) => {
     validate({
       params: {
         name: validateDriverName.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { name } = req.params
       const race = await Race.query().findOne({ name }).throwIfNotFound()
 
-      res.send({ result: race})
+      res.send({ result: race })
     }
   )
 
@@ -73,15 +81,13 @@ const makeRacesRoutes = ({ app }) => {
     validate({
       params: {
         seasonId: validateId.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { seasonId } = req.params
-      const race = await Race.query()
-        .where('seasonId', seasonId)
-        .throwIfNotFound()
+      const race = await Race.query().where({ seasonId }).throwIfNotFound()
 
-      res.send({ result: race})
+      res.send({ result: race })
     }
   )
 
@@ -91,12 +97,12 @@ const makeRacesRoutes = ({ app }) => {
     validate({
       params: {
         circuitId: validateId.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { circuitId } = req.params
       const race = await Race.query()
-        .where('circuitId', circuitId)
+        .where("circuitId", circuitId)
         .throwIfNotFound()
 
       res.send({ result: race })
@@ -115,7 +121,7 @@ const makeRacesRoutes = ({ app }) => {
         location: validateLocation.required(),
         raceDate: validateDate.required(),
         seasonId: validateId.required(),
-        circuitId: validateId.required()
+        circuitId: validateId.required(),
       },
     }),
     async (req, res) => {
@@ -136,7 +142,7 @@ const makeRacesRoutes = ({ app }) => {
           circuitId,
         })
         .returning("*")
-      
+
       res.send({ result: updateRace })
     }
   )
@@ -147,7 +153,7 @@ const makeRacesRoutes = ({ app }) => {
     validate({
       params: {
         raceId: validateId.required(),
-      }
+      },
     }),
     async (req, res) => {
       const { raceId } = req.params

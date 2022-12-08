@@ -47,7 +47,7 @@ const makeUsersRoutes = ({ app }) => {
   // READ collection
   app.get(
     "/users",
-    auth("ADMIN"),
+    // auth("ADMIN"),
     validate({
       query: {
         limit: validateLimit,
@@ -136,7 +136,7 @@ const makeUsersRoutes = ({ app }) => {
     auth("ADMIN"),
     validate({
       params: {
-        userId: validateId.required()
+        userId: validateId.required(),
       },
       body: {
         role: validateRole.required(),
@@ -152,8 +152,8 @@ const makeUsersRoutes = ({ app }) => {
 
       const updatedRole = await user
         .$query()
-        .patch({  
-          role,  
+        .patch({
+          role,
           updatedAt: new Date(),
         })
         .returning("*")
