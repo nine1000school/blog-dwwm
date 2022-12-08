@@ -42,6 +42,35 @@ const makeNewsRoutes = ({ app }) => {
       res.send({ result: gottenNews })
     }
   )
+  app.patch(
+    "/news/:id",
+    validate({
+      params: {
+        id: validateId.required()
+      },
+      body: {
+        title: validatePostTitle,
+        content: validateContent,
+      }
+    }),
+    async (req, res) => {
+      const {
+        params: { id },
+        body: { title, content }
+      } = req
+      
+      const news = await News.query().findById(id).throwIfNotFound()
+
+      const updateNews = await news.$query()
+        .patch({
+          title,
+          content,
+        })
+        .returning("*")
+      
+      res.send({result: updateNews})
+    }
+  )
   app.delete(
     "/news/:id",
     validate({ params: { id: validateId.required() } }),
